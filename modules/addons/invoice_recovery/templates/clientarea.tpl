@@ -11,16 +11,10 @@
                         <label class="form-label font-weight-bold">E-mail da sua conta</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-right-0"><i class="fas fa-envelope text-muted"></i></span>
-                            <input type="email" name="email" class="form-control border-left-0 bg-light py-2" placeholder="Digite seu e-mail cadastrado" required>
+                            <input type="email" name="email" class="form-control border-left-0 bg-light py-2" placeholder="Digite seu e-mail cadastrado" >
                         </div>
                     </div>
-                    <div class="form-group mb-4">
-                        <label class="form-label font-weight-bold">CPF ou CNPJ</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-right-0"><i class="fas fa-id-card text-muted"></i></span>
-                            <input type="text" name="cpf" class="form-control border-left-0 bg-light py-2" placeholder="Somente números" required>
-                        </div>
-                    </div>
+
                     <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm transition-all py-3 font-weight-bold">
                         <i class="fas fa-search mr-2"></i> CONSULTAR FATURAS
                     </button>

@@ -5,6 +5,14 @@ error_reporting(E_ALL);
 
 echo "Iniciando teste...<br>";
 try {
+    echo "Testando classe ClientArea...<br>";
+    if (class_exists('WHMCS\ClientArea')) {
+        $ca = new WHMCS\ClientArea();
+        echo "Instanciação de ClientArea: OK<br>";
+    } else {
+        echo "Classe WHMCS\ClientArea NÃO encontrada.<br>";
+    }
+
     include_once __DIR__ . '/modules/addons/invoice_recovery/invoice_recovery.php';
     echo "Inclusão do arquivo: OK<br>";
     

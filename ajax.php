@@ -3,35 +3,26 @@ require_once __DIR__ . '/init.php';
 use WHMCS\Database\Capsule;
 
 $email = $_POST['email'] ?? '';
-$cpfInput = $_POST['cpf'] ?? '';
 
-if (empty($email) || empty($cpfInput)) {
-    die('<div class="alert alert-warning">Por favor, preencha todos os campos.</div>');
+if (empty($email)) {
+    die('<div class="alert alert-warning">Por favor, informe seu e-mail.</div>');
 }
 
-// Buscar ID do campo de CPF nas configurações do módulo
-$cpfFieldId = Capsule::table('tbladdonmodules')
-    ->where('module', 'invoice_recovery')
-    ->where('setting', 'cpf_field_id')
-    ->value('value');
-
-if (!$cpfFieldId) {
-    die('<div class="alert alert-danger">Erro de configuração: ID do campo CPF não definido no addon.</div>');
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    die('<div class="alert alert-danger">E-mail inválido.</div>');
 }
 
-// Buscar o cliente pelo e-mail e conferir o campo customizado de CPF
+// Buscar o cliente apenas pelo e-mail
 $cliente = Capsule::table('tblclients')
-    ->join('tblcustomfieldsvalues', 'tblclients.id', '=', 'tblcustomfieldsvalues.relid')
-    ->where('tblclients.email', $email)
-    ->where('tblcustomfieldsvalues.fieldid', $cpfFieldId)
-    ->where('tblcustomfieldsvalues.value', 'like', '%' . $cpfInput . '%')
-    ->select('tblclients.id', 'tblclients.firstname', 'tblclients.lastname')
+    ->where('email', $email)
+    ->select('id', 'firstname', 'lastname')
     ->first();
 
 if (!$cliente) {
-    die('<div class="alert alert-danger">Nenhuma conta encontrada com esses dados. Verifique o e-mail e o CPF/CNPJ.</div>');
+    die('<div class="alert alert-danger">Nenhuma conta encontrada com este e-mail.</div>');
 }
 
+// Buscar faturas do cliente
 $faturas = Capsule::table('tblinvoices')
     ->where('userid', $cliente->id)
     ->where('status', 'Unpaid')
