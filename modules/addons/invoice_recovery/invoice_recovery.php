@@ -8,7 +8,7 @@ function invoice_recovery_config() {
         "name" => "Invoice Recovery Pro",
         "description" => "Portal de 2ª via com WhatsApp, PIX e Dashboard",
         "version" => "1.0",
-        "author" => "Rodolfo Cupertino - rodolfols@gmail.com",
+        "author" => "BRANIX Solutions",
         "fields" => [
             "enabled" => ["FriendlyName"=>"Ativar Portal","Type"=>"yesno","Default"=>"on"],
             "enable_pix" => ["FriendlyName"=>"PIX","Type"=>"yesno","Default"=>"on"],
