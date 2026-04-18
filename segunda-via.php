@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 define("CLIENTAREA", true);
 
@@ -19,7 +22,7 @@ $templatePath = '../../modules/addons/invoice_recovery/templates/clientarea.tpl'
 
 // Verificamos se o arquivo existe (opcional, mas bom por segurança)
 if (!file_exists(__DIR__ . '/modules/addons/invoice_recovery/templates/clientarea.tpl')) {
-    die("Erro: Arquivo de template não encontrado.");
+    die("Erro: Template file not found.");
 }
 
 $ca->setTemplate($templatePath);

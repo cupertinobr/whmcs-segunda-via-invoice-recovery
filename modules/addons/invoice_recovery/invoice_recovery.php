@@ -4,6 +4,20 @@ use WHMCS\Database\Capsule;
 if (!defined("WHMCS")) die("Acesso negado");
 
 function invoice_recovery_config() {
+    $customFields = [];
+    try {
+        $fields = Capsule::table('tblcustomfields')
+            ->where('type', 'client')
+            ->orderBy('fieldname', 'asc')
+            ->get();
+
+        foreach ($fields as $field) {
+            $customFields[$field->id] = $field->fieldname;
+        }
+    } catch (\Exception $e) {
+        // Fallback caso ocorra algum erro na consulta
+    }
+
     return [
         "name" => "Invoice Recovery Pro",
         "description" => "Portal de 2ª via com WhatsApp, PIX e Dashboard",
@@ -14,7 +28,12 @@ function invoice_recovery_config() {
             "enable_pix" => ["FriendlyName"=>"PIX","Type"=>"yesno","Default"=>"on"],
             "enable_boleto" => ["FriendlyName"=>"Boleto","Type"=>"yesno","Default"=>"on"],
             "enable_cartao" => ["FriendlyName"=>"Cartão","Type"=>"yesno","Default"=>"on"],
-            "cpf_field_id" => ["FriendlyName"=>"ID CPF/CNPJ","Type"=>"text"],
+            "cpf_field_id" => [
+                "FriendlyName" => "Campo CPF/CNPJ",
+                "Type" => "dropdown",
+                "Options" => $customFields,
+                "Description" => "Selecione o campo personalizado que contém o CPF ou CNPJ do cliente.",
+            ],
             "whatsapp_token" => ["FriendlyName"=>"Token Z-API","Type"=>"text"],
             "whatsapp_instance" => ["FriendlyName"=>"Instance ID","Type"=>"text"],
         ]
