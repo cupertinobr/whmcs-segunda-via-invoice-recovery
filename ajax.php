@@ -32,7 +32,7 @@ $faturas = Capsule::table('tblinvoices')
 if ($faturas->isEmpty()) {
     echo '<div class="alert alert-info text-center">
             <i class="fas fa-check-circle fa-2x mb-3 d-block"></i>
-            Parabéns, <strong>' . $cliente->firstname . '</strong>! Não encontramos faturas pendentes.
+            Parabéns, não encontramos faturas pendentes.
           </div>';
     exit;
 }

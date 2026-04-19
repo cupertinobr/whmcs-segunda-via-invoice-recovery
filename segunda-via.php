@@ -10,6 +10,6 @@ $ca->initPage();
 
 // O WHMCS busca o template relativo à pasta do tema ativo.
 // Usamos o caminho partindo da raiz para garantir compatibilidade.
-$ca->setTemplate('/modules/addons/invoice_recovery/templates/clientarea');
+$ca->setTemplate('/modules/addons/invoice_recovery/templates/clientarea.tpl');
 
 $ca->output();
