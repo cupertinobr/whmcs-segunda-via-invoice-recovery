@@ -5,8 +5,8 @@ require_once __DIR__ . '/init.php';
 use WHMCS\Database\Capsule;
 
 // Carregar Idioma do Addon
-$ca_lang = new WHMCS\ClientArea();
-$language = $ca_lang->getLanguage();
+global $whmcs;
+$language = strtolower($whmcs->getClientLanguage());
 $langFile = __DIR__ . '/modules/addons/invoice_recovery/lang/' . $language . '.php';
 if (!file_exists($langFile)) {
     $langFile = __DIR__ . '/modules/addons/invoice_recovery/lang/english.php';
