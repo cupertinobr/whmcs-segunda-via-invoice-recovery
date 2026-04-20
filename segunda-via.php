@@ -6,7 +6,42 @@ use WHMCS\Database\Capsule;
 
 // Handle AJAX / Form actions
 $action = $_REQUEST['action'] ?? '';
-$email = $_POST['email'] ?? '';
+$documento = $_POST['documento'] ?? '';
+
+/**
+ * Validações de Documentos (CPF/CNPJ)
+ */
+function validarCPF($cpf) {
+    if (empty($cpf)) return false;
+    $cpf = preg_replace('/[^0-9]/', '', $cpf);
+    if (strlen($cpf) != 11 || preg_match('/(\d)\1{10}/', $cpf)) return false;
+    for ($t = 9; $t < 11; $t++) {
+        for ($d = 0, $c = 0; $c < $t; $c++) {
+            $d += $cpf[$c] * (($t + 1) - $c);
+        }
+        $d = ((10 * $d) % 11) % 10;
+        if ($cpf[$c] != $d) return false;
+    }
+    return true;
+}
+
+function validarCNPJ($cnpj) {
+    if (empty($cnpj)) return false;
+    $cnpj = preg_replace('/[^0-9]/', '', $cnpj);
+    if (strlen($cnpj) != 14) return false;
+    for ($i = 0, $j = 5, $soma = 0; $i < 12; $i++) {
+        $soma += $cnpj[$i] * $j;
+        $j = ($j == 2) ? 9 : $j - 1;
+    }
+    $resto = $soma % 11;
+    if ($cnpj[12] != ($resto < 2 ? 0 : 11 - $resto)) return false;
+    for ($i = 0, $j = 6, $soma = 0; $i < 13; $i++) {
+        $soma += $cnpj[$i] * $j;
+        $j = ($j == 2) ? 9 : $j - 1;
+    }
+    $resto = $soma % 11;
+    return $cnpj[13] == ($resto < 2 ? 0 : 11 - $resto);
+}
 
 // Configurações do Addon
 $addonConfig = Capsule::table('tbladdonmodules')->where('module', 'invoice_recovery')->pluck('value', 'setting');
@@ -16,7 +51,7 @@ $enablePix = ($addonConfig['enable_pix'] ?? '') === 'on';
 $enableBoleto = ($addonConfig['enable_boleto'] ?? '') === 'on';
 $enableCartao = ($addonConfig['enable_cartao'] ?? '') === 'on';
 
-if (!$portalEnabled && !empty($email)) {
+if (!$portalEnabled && !empty($documento)) {
     die('<div class="alert alert-warning text-center">O portal de 2ª via está temporariamente desativado.</div>');
 }
 
@@ -56,19 +91,38 @@ if ($action === 'pay') {
 /**
  * Lógica de Busca de Faturas (via POST)
  */
-if (!empty($email)) {
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        die('<div class="alert alert-danger">E-mail inválido.</div>');
+if (!empty($documento)) {
+    $docLimpo = preg_replace('/[^0-9]/', '', $documento);
+    
+    // 1. Validar CPF ou CNPJ
+    if (!validarCPF($docLimpo) && !validarCNPJ($docLimpo)) {
+        die('<div class="alert alert-danger shadow-sm border-0 py-3 animate-fade-in text-center">
+                <i class="fas fa-exclamation-circle fa-2x mb-3 d-block text-danger"></i>
+                <h6 class="font-weight-bold">Documento Inválido</h6>
+                <p class="mb-0 small">O CPF ou CNPJ informado não é válido. Verifique os números e tente novamente.</p>
+             </div>');
     }
 
-    // Buscar o cliente pelo e-mail
-    $cliente = Capsule::table('tblclients')
-        ->where('email', $email)
-        ->select('id', 'firstname', 'lastname')
+    // 2. Buscar o cliente pelo campo personalizado configurado
+    $cpfFieldId = (int)($addonConfig['cpf_field_id'] ?? 0);
+    
+    if (!$cpfFieldId) {
+        die('<div class="alert alert-danger text-center">Configuração incompleta: Campo de CPF não definido no módulo.</div>');
+    }
+
+    $cliente = Capsule::table('tblcustomfieldsvalues')
+        ->join('tblclients', 'tblclients.id', '=', 'tblcustomfieldsvalues.relid')
+        ->where('tblcustomfieldsvalues.fieldid', $cpfFieldId)
+        ->where('tblcustomfieldsvalues.value', $docLimpo)
+        ->select('tblclients.id', 'tblclients.firstname', 'tblclients.lastname', 'tblclients.email')
         ->first();
 
     if (!$cliente) {
-        die('<div class="alert alert-danger">Nenhuma conta encontrada com este e-mail.</div>');
+        die('<div class="alert alert-danger shadow-sm border-0 py-3 animate-fade-in text-center">
+                <i class="fas fa-user-times fa-2x mb-3 d-block text-danger"></i>
+                <h6 class="font-weight-bold">Não Encontrado</h6>
+                <p class="mb-0 small">Não encontramos nenhum cliente cadastrado com este documento.</p>
+             </div>');
     }
 
     // 2. Verificar se a 2ª Via está desativada para este cliente

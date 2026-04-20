@@ -4,14 +4,14 @@
         <header class="recovery-header text-center">
             <span class="view-badge">2ª VIA DE FATURA</span>
             <h1 class="view-title">Consulte suas faturas</h1>
-            <p class="view-desc">Informe seu e-mail cadastrado para listar suas faturas pendentes.</p>
+            <p class="view-desc">Informe seu CPF ou CNPJ para listar suas faturas pendentes.</p>
         </header>
 
         <div class="search-card">
             <form id="formBusca" class="search-form">
                 <div class="input-box">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" name="email" id="emailInput" placeholder="seu@email.com.br" required>
+                    <i class="fas fa-id-card"></i>
+                    <input type="text" name="documento" id="documentoInput" placeholder="000.000.000-00" required maxlength="18">
                 </div>
                 <button type="submit" class="btn-primary-custom btn-submit">
                     <span class="btn-text">Consultar</span>
@@ -42,6 +42,11 @@ $(document).ready(function() {
     // Buscar IP via API externa
     $.getJSON('https://api.ipify.org?format=json', function(data) {
         $("#user-ip").text(data.ip);
+    });
+
+    // Filtro para aceitar apenas números e caracteres de formatação
+    $("#documentoInput").on("input", function() {
+        this.value = this.value.replace(/[^0-9.\-\/]/g, "");
     });
 
     $("#formBusca").on("submit", function(e) {
