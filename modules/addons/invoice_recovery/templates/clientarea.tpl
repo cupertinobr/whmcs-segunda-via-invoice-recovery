@@ -2,19 +2,19 @@
     <div class="recovery-container">
         
         <header class="recovery-header text-center">
-            <span class="view-badge">{$LANG.title_recovery}</span>
-            <h1 class="view-title">{$LANG.search_title}</h1>
-            <p class="view-desc">{$LANG.search_desc}</p>
+            <span class="view-badge">{$RECOVERY_LANG.title_recovery}</span>
+            <h1 class="view-title">{$RECOVERY_LANG.search_title}</h1>
+            <p class="view-desc">{$RECOVERY_LANG.search_desc}</p>
         </header>
 
         <div class="search-card">
             <form id="formBusca" class="search-form">
                 <div class="input-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" name="documento" id="documentoInput" placeholder="{$LANG.input_placeholder}" required>
+                    <input type="text" name="documento" id="documentoInput" placeholder="{$RECOVERY_LANG.input_placeholder}" required>
                 </div>
                 <button type="submit" class="btn-primary-custom btn-submit">
-                    <span class="btn-text">{$LANG.btn_search}</span>
+                    <span class="btn-text">{$RECOVERY_LANG.btn_search}</span>
                     <i class="fas fa-search"></i>
                 </button>
             </form>
@@ -22,13 +22,13 @@
 
         <div id="loading" class="loading-state d-none text-center">
             <div class="loading-spinner"></div>
-            <p>{$LANG.loading_find}</p>
+            <p>{$RECOVERY_LANG.loading_find}</p>
         </div>
 
         <div id="resultado" class="results-wrapper"></div>
 
         <div class="security-info text-center">
-            <p><i class="fas fa-lock"></i> {$LANG.security_info|replace:':ip':'<span id="user-ip">...</span>'}</p>
+            <p><i class="fas fa-lock"></i> {$RECOVERY_LANG.security_info|replace:':ip':'<span id="user-ip">...</span>'}</p>
         </div>
 
     </div>
@@ -58,18 +58,18 @@ $(document).ready(function() {
         $("#loading").removeClass("d-none");
         
         $btn.prop('disabled', true);
-        $btnText.text('{$LANG.searching}');
+        $btnText.text('{$RECOVERY_LANG.searching}');
 
         $.post("segunda-via.php", $(this).serialize(), function(data) {
             $("#loading").addClass("d-none");
             $("#resultado").html(data).fadeIn();
             $btn.prop('disabled', false);
-            $btnText.text('{$LANG.btn_search}');
+            $btnText.text('{$RECOVERY_LANG.btn_search}');
         }).fail(function() {
             $("#loading").addClass("d-none");
-            $("#resultado").html('<div class="alert alert-danger shadow-sm border-0 py-3"><i class="fas fa-exclamation-triangle mr-2"></i> {$LANG.error_internal}</div>').fadeIn();
+            $("#resultado").html('<div class="alert alert-danger shadow-sm border-0 py-3"><i class="fas fa-exclamation-triangle mr-2"></i> {$RECOVERY_LANG.error_internal}</div>').fadeIn();
             $btn.prop('disabled', false);
-            $btnText.text('{$LANG.btn_search}');
+            $btnText.text('{$RECOVERY_LANG.btn_search}');
         });
     });
 
@@ -79,7 +79,7 @@ $(document).ready(function() {
         if($this.hasClass('btn-pay')) {
             setTimeout(function() {
                  $("#resultado").fadeOut();
-                 $("#loading").removeClass("d-none").find('p').text('{$LANG.redirecting_gateway}');
+                 $("#loading").removeClass("d-none").find('p').text('{$RECOVERY_LANG.redirecting_gateway}');
                  
                  setTimeout(function() {
                      location.reload();

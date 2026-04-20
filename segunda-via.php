@@ -5,8 +5,8 @@ require_once __DIR__ . '/init.php';
 use WHMCS\Database\Capsule;
 
 // Carregar Idioma do Addon
-global $whmcs;
-$language = strtolower($whmcs->getClientLanguage());
+$language = (isset($_SESSION['Language']) && $_SESSION['Language']) ? $_SESSION['Language'] : 'portuguese-br';
+$language = strtolower($language);
 $langFile = __DIR__ . '/modules/addons/invoice_recovery/lang/' . $language . '.php';
 if (!file_exists($langFile)) {
     $langFile = __DIR__ . '/modules/addons/invoice_recovery/lang/english.php';
@@ -235,7 +235,7 @@ $ca->setPageTitle($_ADDONLANG['page_title']);
 $ca->addToBreadCrumb('index.php', $_ADDONLANG['breadcrumb_portal']);
 $ca->addToBreadCrumb('segunda-via.php', $_ADDONLANG['page_title']);
 $ca->initPage();
-$ca->assign('LANG', $_ADDONLANG);
+$ca->assign('RECOVERY_LANG', $_ADDONLANG);
 
 // O WHMCS busca o template relativo à pasta do tema ativo.
 // Usamos o caminho partindo da raiz para garantir compatibilidade.
