@@ -4,6 +4,16 @@ require_once __DIR__ . '/init.php';
 
 use WHMCS\Database\Capsule;
 
+// Carregar Idioma do Addon
+$ca_lang = new WHMCS\ClientArea();
+$language = $ca_lang->getLanguage();
+$langFile = __DIR__ . '/modules/addons/invoice_recovery/lang/' . $language . '.php';
+if (!file_exists($langFile)) {
+    $langFile = __DIR__ . '/modules/addons/invoice_recovery/lang/english.php';
+}
+require_once $langFile;
+
+
 // Handle AJAX / Form actions
 $action = $_REQUEST['action'] ?? '';
 $documento = $_POST['documento'] ?? '';
@@ -52,7 +62,7 @@ $enableBoleto = ($addonConfig['enable_boleto'] ?? '') === 'on';
 $enableCartao = ($addonConfig['enable_cartao'] ?? '') === 'on';
 
 if (!$portalEnabled && !empty($documento)) {
-    die('<div class="alert alert-warning text-center">O portal de 2ª via está temporariamente desativado.</div>');
+    die('<div class="alert alert-warning text-center">' . $_ADDONLANG['portal_disabled'] . '</div>');
 }
 
 /**
@@ -64,7 +74,7 @@ if ($action === 'pay') {
 
     // 1. Buscar UserID
     $userid = Capsule::table('tblinvoices')->where('id', $invoiceId)->value('userid');
-    if (!$userid) die('Fatura não encontrada.');
+    if (!$userid) die($_ADDONLANG['invoice_not_found']);
 
     // 2. Atualizar Gateway via Admin API
     $adminUser = Capsule::table('tbladmins')->where('disabled', 0)->value('username');
@@ -108,14 +118,14 @@ if (!empty($documento)) {
         if (!validarCPF($docLimpo) && !validarCNPJ($docLimpo)) {
             die('<div class="alert alert-danger shadow-sm border-0 py-3 animate-fade-in text-center">
                     <i class="fas fa-exclamation-circle fa-2x mb-3 d-block text-danger"></i>
-                    <h6 class="font-weight-bold">Dados Inválidos</h6>
-                    <p class="mb-0 small">O E-mail ou CPF/CNPJ informado não é válido. Verifique e tente novamente.</p>
+                    <h6 class="font-weight-bold">' . $_ADDONLANG['invalid_data'] . '</h6>
+                    <p class="mb-0 small">' . $_ADDONLANG['invalid_data_desc'] . '</p>
                  </div>');
         }
 
         $cpfFieldId = (int)($addonConfig['cpf_field_id'] ?? 0);
         if (!$cpfFieldId) {
-            die('<div class="alert alert-danger text-center">Configuração incompleta: Campo de CPF não definido no módulo.</div>');
+            die('<div class="alert alert-danger text-center">' . $_ADDONLANG['config_incomplete'] . '</div>');
         }
 
         $cliente = Capsule::table('tblcustomfieldsvalues')
@@ -129,8 +139,8 @@ if (!empty($documento)) {
     if (!$cliente) {
         die('<div class="alert alert-danger shadow-sm border-0 py-3 animate-fade-in text-center">
                 <i class="fas fa-user-times fa-2x mb-3 d-block text-danger"></i>
-                <h6 class="font-weight-bold">Não Encontrado</h6>
-                <p class="mb-0 small">Não encontramos nenhum cliente com os dados informados.</p>
+                <h6 class="font-weight-bold">' . $_ADDONLANG['not_found'] . '</h6>
+                <p class="mb-0 small">' . $_ADDONLANG['not_found_desc'] . '</p>
              </div>');
     }
 
@@ -145,8 +155,8 @@ if (!empty($documento)) {
     if (strtolower($isDisabled) == 'yes' || strtolower($isDisabled) == 'on' || $isDisabled == '1') {
         die('<div class="alert alert-warning shadow-sm border-0 py-3 animate-fade-in text-center">
                 <i class="fas fa-user-lock fa-2x mb-3 d-block text-warning"></i>
-                <h6 class="font-weight-bold">Acesso Restrito</h6>
-                <p class="mb-0 small">Identificamos que o acesso simplificado está desativado para sua conta.</p>
+                <h6 class="font-weight-bold">' . $_ADDONLANG['restricted_access'] . '</h6>
+                <p class="mb-0 small">' . $_ADDONLANG['restricted_access_desc'] . '</p>
              </div>');
     }
 
@@ -158,16 +168,16 @@ if (!empty($documento)) {
         ->get();
 
     if ($faturas->isEmpty()) {
-        echo '<div class="alert alert-info text-center">Parabéns, não encontramos faturas pendentes.</div>';
+        echo '<div class="alert alert-info text-center">' . $_ADDONLANG['no_pending_invoices'] . '</div>';
         exit;
     }
 
-    echo '<h5 class="mb-3 mt-2">Faturas não pagas:</h5>';
+    echo '<h5 class="mb-3 mt-2">' . $_ADDONLANG['unpaid_invoices'] . '</h5>';
     echo '<div class="list-group shadow-sm">';
 
     foreach ($faturas as $f) {
-        $duedate = date('d/m/Y', strtotime($f->duedate));
-        $total = number_format($f->total, 2, ',', '.');
+        $duedate = date($_ADDONLANG['date_format'], strtotime($f->duedate));
+        $total = number_format($f->total, 2, $_ADDONLANG['decimal_separator'], $_ADDONLANG['thousands_separator']);
         
         // Gerar Link SSO com trava de restrição
         $adminUser = Capsule::table('tbladmins')->where('disabled', 0)->value('username');
@@ -195,22 +205,22 @@ if (!empty($documento)) {
         echo "
         <div class='invoice-card-custom animate-fade-in'>
             <div class='invoice-meta'>
-                <h5>Fatura #{$f->id}</h5>
-                <p>Vencimento: <strong>{$duedate}</strong> | Total: <strong>R$ {$total}</strong></p>
+                <h5>{$_ADDONLANG['invoice_num']}{$f->id}</h5>
+                <p>{$_ADDONLANG['due_date']} <strong>{$duedate}</strong> | {$_ADDONLANG['total']} <strong>{$_ADDONLANG['currency_prefix']}{$total}{$_ADDONLANG['currency_suffix']}</strong></p>
             </div>
             <div class='invoice-btns'>
-                <a href='{$viewLink}' target='_blank' class='btn-act btn-act-light'><i class='fas fa-eye'></i> Ver</a>";
+                <a href='{$viewLink}' target='_blank' class='btn-act btn-act-light'><i class='fas fa-eye'></i> {$_ADDONLANG['view']}</a>";
         
         if ($enablePix) {
-            echo "<a href='{$payPixLink}' target='_blank' class='btn-act btn-act-primary btn-pay'><i class='fas fa-qrcode'></i> PIX</a>";
+            echo "<a href='{$payPixLink}' target='_blank' class='btn-act btn-act-primary btn-pay'><i class='fas fa-qrcode'></i> {$_ADDONLANG['pix']}</a>";
         }
 
         if ($enableBoleto && $boletoGateway) {
-            echo "<a href='{$payBoletoLink}' target='_blank' class='btn-act btn-act-primary btn-pay'><i class='fas fa-barcode'></i> Boleto</a>";
+            echo "<a href='{$payBoletoLink}' target='_blank' class='btn-act btn-act-primary btn-pay'><i class='fas fa-barcode'></i> {$_ADDONLANG['boleto']}</a>";
         }
         
         if ($enableCartao) {
-            echo "<a href='{$payCreditCardLink}' target='_blank' class='btn-act btn-act-primary btn-pay'><i class='fas fa-credit-card'></i> Cartão</a>";
+            echo "<a href='{$payCreditCardLink}' target='_blank' class='btn-act btn-act-primary btn-pay'><i class='fas fa-credit-card'></i> {$_ADDONLANG['cartao']}</a>";
         }
         
         echo "</div></div>";
@@ -221,10 +231,11 @@ if (!empty($documento)) {
 }
 
 $ca = new WHMCS\ClientArea();
-$ca->setPageTitle("2ª Via de Pagamento");
-$ca->addToBreadCrumb('index.php', 'Portal');
-$ca->addToBreadCrumb('segunda-via.php', '2ª Via de Pagamento');
+$ca->setPageTitle($_ADDONLANG['page_title']);
+$ca->addToBreadCrumb('index.php', $_ADDONLANG['breadcrumb_portal']);
+$ca->addToBreadCrumb('segunda-via.php', $_ADDONLANG['page_title']);
 $ca->initPage();
+$ca->assign('LANG', $_ADDONLANG);
 
 // O WHMCS busca o template relativo à pasta do tema ativo.
 // Usamos o caminho partindo da raiz para garantir compatibilidade.

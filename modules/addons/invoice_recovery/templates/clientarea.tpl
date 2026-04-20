@@ -2,19 +2,19 @@
     <div class="recovery-container">
         
         <header class="recovery-header text-center">
-            <span class="view-badge">2ª VIA DE FATURA</span>
-            <h1 class="view-title">Consulte suas faturas</h1>
-            <p class="view-desc">Informe seu E-mail ou CPF/CNPJ para listar suas faturas pendentes.</p>
+            <span class="view-badge">{$LANG.title_recovery}</span>
+            <h1 class="view-title">{$LANG.search_title}</h1>
+            <p class="view-desc">{$LANG.search_desc}</p>
         </header>
 
         <div class="search-card">
             <form id="formBusca" class="search-form">
                 <div class="input-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" name="documento" id="documentoInput" placeholder="E-mail ou CPF/CNPJ" required>
+                    <input type="text" name="documento" id="documentoInput" placeholder="{$LANG.input_placeholder}" required>
                 </div>
                 <button type="submit" class="btn-primary-custom btn-submit">
-                    <span class="btn-text">Consultar</span>
+                    <span class="btn-text">{$LANG.btn_search}</span>
                     <i class="fas fa-search"></i>
                 </button>
             </form>
@@ -22,13 +22,13 @@
 
         <div id="loading" class="loading-state d-none text-center">
             <div class="loading-spinner"></div>
-            <p>Estamos localizando suas faturas...</p>
+            <p>{$LANG.loading_find}</p>
         </div>
 
         <div id="resultado" class="results-wrapper"></div>
 
         <div class="security-info text-center">
-            <p><i class="fas fa-lock"></i> Ambiente Seguro SSL — Seu IP (<span id="user-ip">...</span>) está registrado.</p>
+            <p><i class="fas fa-lock"></i> {$LANG.security_info|replace:':ip':'<span id="user-ip">...</span>'}</p>
         </div>
 
     </div>
@@ -58,18 +58,18 @@ $(document).ready(function() {
         $("#loading").removeClass("d-none");
         
         $btn.prop('disabled', true);
-        $btnText.text('Buscando...');
+        $btnText.text('{$LANG.searching}');
 
         $.post("segunda-via.php", $(this).serialize(), function(data) {
             $("#loading").addClass("d-none");
             $("#resultado").html(data).fadeIn();
             $btn.prop('disabled', false);
-            $btnText.text('Consultar');
+            $btnText.text('{$LANG.btn_search}');
         }).fail(function() {
             $("#loading").addClass("d-none");
-            $("#resultado").html('<div class="alert alert-danger shadow-sm border-0 py-3"><i class="fas fa-exclamation-triangle mr-2"></i> Ops! Ocorreu um erro interno. Tente mais tarde.</div>').fadeIn();
+            $("#resultado").html('<div class="alert alert-danger shadow-sm border-0 py-3"><i class="fas fa-exclamation-triangle mr-2"></i> {$LANG.error_internal}</div>').fadeIn();
             $btn.prop('disabled', false);
-            $btnText.text('Consultar');
+            $btnText.text('{$LANG.btn_search}');
         });
     });
 
@@ -79,7 +79,7 @@ $(document).ready(function() {
         if($this.hasClass('btn-pay')) {
             setTimeout(function() {
                  $("#resultado").fadeOut();
-                 $("#loading").removeClass("d-none").find('p').text('Encaminhando para o gateway de pagamento...');
+                 $("#loading").removeClass("d-none").find('p').text('{$LANG.redirecting_gateway}');
                  
                  setTimeout(function() {
                      location.reload();
