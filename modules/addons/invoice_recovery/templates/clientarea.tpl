@@ -1,305 +1,385 @@
-<div class="recovery-container">
-    <div class="recovery-card">
-        <div class="badge-container">
-            <span class="recovery-badge">SEGUNDA VIA</span>
-        </div>
-        
-        <h2 class="card-title">Consulte suas faturas</h2>
-        <p class="card-subtitle">Digite o e-mail cadastrado na sua conta para visualizar faturas em aberto.</p>
+<div class="recovery-page-wrapper">
+    <div class="recovery-main-content">
+        <header class="recovery-header">
+            <span class="badge-new">SEGUNDA VIA</span>
+            <h1 class="main-title">Consulte suas faturas</h1>
+            <p class="main-subtitle">Informe seu e-mail para localizar faturas pendentes de forma rápida e segura.</p>
+        </header>
 
-        <form id="formBusca" class="recovery-form">
-            <div class="input-wrapper">
-                <div class="input-group-custom">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" name="email" placeholder="seu@email.com.br" required>
+        <div class="card-glass">
+            <form id="formBusca" class="search-form">
+                <div class="input-container">
+                    <div class="input-icon-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" name="email" id="emailInput" placeholder="exemplo@gmail.com" required>
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        <span class="btn-text">Consultar</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
                 </div>
-                <button type="submit" class="btn-consultar">Consultar</button>
-            </div>
-        </form>
-
-       <!-- <div class="security-footer">
-            <span><i class="fas fa-shield-alt"></i> Ambiente seguro</span>
-            <span><i class="fas fa-check-circle"></i> Dados criptografados</span>
-        </div> -->
-    </div>
-
-    
-
-    <div id="loading" class="text-center mt-5 d-none">
-        <div class="spinner-border text-success mb-3" role="status" style="width: 3rem; height: 3rem;">
-            <span class="sr-only">Carregando...</span>
+            </form>
         </div>
-        <p class="text-muted font-italic">Localizando faturas...</p>
-    </div>
 
-    <div id="resultado" class="mt-5"></div>
-  
-  <div class="ip-info-banner">
-        <i class="fas fa-fingerprint"></i>
-        <p>Ambiente seguro — seu acesso (IPv4: <span id="user-ip">...</span>) é registrado para sua proteção.</p>
+        <div id="loading" class="result-placeholder d-none">
+            <div class="elegant-loader">
+                <div class="spinner"></div>
+                <p>Buscando faturas no sistema...</p>
+            </div>
+        </div>
+
+        <div id="resultado" class="result-container mt-4"></div>
+
+        <footer class="recovery-footer">
+            <div class="footer-badge">
+                <i class="fas fa-shield-alt"></i>
+                <span>Conexão Segura</span>
+            </div>
+            <div class="footer-info">
+                Sua sessão está sendo registrada para segurança. IP: <span id="user-ip">...</span>
+            </div>
+        </footer>
     </div>
 </div>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-.recovery-container {
-    font-family: 'Inter', sans-serif;
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 0 20px;
+:root {
+    --primary-color: #7643C9;
+    --primary-hover: #6336b1;
+    --bg-page: #f8f9ff;
+    --card-bg: #ffffff;
+    --text-main: #1a1e26;
+    --text-muted: #64748b;
+    --input-bg: #f8fafc;
+    --input-border: #e2e8f0;
+    --input-focus: #7643C9;
+    --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    --shadow-strong: 0 40px 60px -15px rgba(118, 67, 201, 0.1);
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 12px;
 }
 
-.recovery-header h1 {
-    font-size: 32px;
-    font-weight: 800;
-    color: #111;
-    margin-bottom: 5px;
+/* Forçado para modo claro se o tema pai for escuro, ou adaptativo */
+.recovery-page-wrapper {
+    --bg-page: #f8f9ff;
+    --card-bg: #ffffff;
+    --text-main: #1a1e26;
+    --text-muted: #64748b;
 }
 
-.recovery-header p {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 30px;
+@media (prefers-color-scheme: dark) {
+    .recovery-page-wrapper {
+        --bg-page: #0f172a;
+        --card-bg: #1e293b;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --input-bg: #0f172a;
+        --input-border: #334155;
+    }
 }
 
-.recovery-card {
-    /* background: #fff; */
-    border-radius: 20px;
-    padding: 20px 20px;
+.recovery-page-wrapper {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 480px;
+    display: flex;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+    color: var(--text-main);
+}
+
+.recovery-main-content {
+    width: 100%;
+    max-width: 680px;
     text-align: center;
-    /* color: #fff; */
-    box-shadow: 0 0 45px rgba(0,0,0,0.4);
 }
 
-.badge-container {
-    margin-bottom: 25px;
-}
-
-.recovery-badge {
+.badge-new {
     background: rgba(118, 67, 201, 0.1);
-    color: #7643C9;
+    color: var(--primary-color);
     padding: 6px 16px;
-    border-radius: 50px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-}
-
-.card-title {
-    font-size: 36px;
+    border-radius: 100px;
+    font-size: 0.75rem;
     font-weight: 800;
-    margin-bottom: 15px;
-    letter-spacing: -0.5px;
+    letter-spacing: 0.05em;
+    display: inline-block;
+    margin-bottom: 1.5rem;
 }
 
-.card-subtitle {
-    font-size: 16px;
-    color: #999;
-    max-width: 500px;
-    margin: 0 auto 40px;
+.main-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    margin-bottom: 1.25rem;
+}
+
+.main-subtitle {
+    color: var(--text-muted);
+    font-size: 1.15rem;
+    max-width: 520px;
+    margin: 0 auto 3.5rem;
     line-height: 1.6;
 }
 
-.recovery-form {
-    max-width: 600px;
-    margin: 0 auto 30px;
+.card-glass {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-strong);
+    border: 1px solid var(--input-border);
 }
 
-.input-wrapper {
+.input-container {
     display: flex;
-    background: #1e1e1e;
-    border: 1px solid #333;
-    border-radius: 12px;
-    padding: 8px;
-    align-items: center;
-    transition: border-color 0.3s;
+    gap: 0.75rem;
+    background: var(--input-bg);
+    padding: 0.6rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--input-border);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.input-wrapper:focus-within {
-    border-color: #7643C9;
+.input-container:focus-within {
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 4px rgba(118, 67, 201, 0.15);
+    background: var(--card-bg);
 }
 
-.input-group-custom {
+.input-icon-group {
     display: flex;
     align-items: center;
-    flex-grow: 1;
-    padding-left: 15px;
+    flex: 1;
+    padding-left: 1rem;
 }
 
-.input-group-custom i {
-    color: #666;
-    margin-right: 12px;
+.input-icon-group i {
+    color: var(--text-muted);
+    margin-right: 14px;
+    font-size: 1.2rem;
 }
 
-.input-group-custom input {
-    background: transparent;
-    border: none;
-    color: #fff; 
+.input-icon-group input {
     width: 100%;
-    height: 45px;
-    outline: none;
-    font-size: 16px;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 14px 0;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--text-main);
+    outline: none !important;
 }
 
-.btn-consultar {
-    background: #7643C9;
-    /* color: #fff; */
+.btn-submit {
+    background: var(--primary-color);
+    color: white !important;
     border: none;
-    padding: 0 30px;
-    height: 48px;
-    border-radius: 8px;
+    padding: 0 2rem;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-submit:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -6px rgba(118, 67, 201, 0.4);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+.result-placeholder {
+    margin-top: 4rem;
+}
+
+.elegant-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.spinner {
+    width: 56px;
+    height: 56px;
+    border: 5px solid rgba(118, 67, 201, 0.1);
+    border-top: 5px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 0.8s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.recovery-footer {
+    margin-top: 5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.footer-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #059669;
+    font-size: 0.85rem;
+    font-weight: 700;
+    background: rgba(16, 185, 129, 0.08);
+    padding: 6px 16px;
+    border-radius: 100px;
+}
+
+.footer-info {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Estilos para Resultados - Injetados via PHP */
+.invoice-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    padding: 1.75rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--input-border);
+    text-align: left;
+    transition: all 0.3s ease;
+    animation: slideUp 0.4s ease forwards;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.invoice-card:hover {
+    box-shadow: var(--shadow-soft);
+    border-color: var(--primary-color);
+    transform: scale(1.01);
+}
+
+.invoice-info h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.invoice-info p {
+    margin: 6px 0 0;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.invoice-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-action {
+    padding: 12px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
-}
-
-.btn-consultar:hover {
-    background: #690AC2;
-    transform: translateY(-1px);
-}
-
-.security-footer {
-    display: flex;
-    justify-content: center;
-    gap: 25px;
-    margin-top: 10px;
-}
-
-.security-footer span {
-    font-size: 13px;
-    color: #7643C9;
+    transition: all 0.2s ease;
+    text-decoration: none !important;
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.ip-info-banner {
-    /*background: #fdfdfd;*/
-    border: 1px solid #eee;
-    border-radius: 12px;
-    padding: 15px 25px;
-    margin-top: 30px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
+.btn-secondary {
+    background: var(--input-bg);
+    color: var(--text-main) !important;
+    border: 1px solid var(--input-border);
 }
 
-.ip-info-banner i {
-    color: #7643C9;
-    font-size: 20px;
+.btn-primary-new {
+    background: var(--primary-color);
+    color: white !important;
+    border: none;
 }
 
-.ip-info-banner p {
-    margin: 0;
-    font-size: 13px;
-    color: #777;
+.btn-action:hover {
+    filter: brightness(1.05);
+    transform: translateY(-3px);
 }
 
-/* Estilos para o resultado */
-#resultado .list-group-item {
-    background: #fff;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    border: 1px solid #eee;
+.btn-primary-new:hover {
+    box-shadow: 0 6px 15px -4px rgba(118, 67, 201, 0.4);
 }
 
-.spinner-border.text-success {
-    color: #7643C9 !important;
-}
-
-.btn-success {
-    background-color: #7643C9 !important;
-    border-color: #7643C9 !important;
-}
-
-.btn-success:hover {
-    background-color: #690AC2 !important;
-    border-color: #690AC2 !important;
-}
-
-.text-primary {
-    color: #7643C9 !important;
-}
-
-.badge-warning {
-    background-color: #fff3cd;
-    color: #856404;
-}
-
-@media (max-width: 600px) {
-    .input-wrapper {
-        flex-direction: column;
-        background: transparent;
-        border: none;
-        padding: 0;
-    }
-    .input-group-custom {
-        background: #1a1a1a;
-        border: 1px solid #333;
-        border-radius: 12px;
-        margin-bottom: 10px;
-        width: 100%;
-    }
-    .btn-consultar {
-        width: 100%;
-    }
-    .recovery-card {
-        padding: 40px 20px;
-    }
-    .card-title {
-        font-size: 28px;
-    }
+@media (max-width: 768px) {
+    .main-title { font-size: 2.25rem; }
+    .input-container { flex-direction: column; padding: 0.75rem; }
+    .btn-submit { width: 100%; justify-content: center; height: 56px; }
+    .invoice-card { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+    .invoice-actions { width: 100%; flex-direction: column; }
+    .btn-action { width: 100%; justify-content: center; }
 }
 </style>
 
 <script>
 $(document).ready(function() {
-    // Buscar IP do usuário (simulação ou via serviço público já que não temos direto no template facilmente)
+    // Buscar IP via API externa
     $.getJSON('https://api.ipify.org?format=json', function(data) {
         $("#user-ip").text(data.ip);
     });
 
     $("#formBusca").on("submit", function(e) {
         e.preventDefault();
+        const $btn = $(this).find('.btn-submit');
+        const $btnText = $btn.find('.btn-text');
+        
         $("#resultado").hide().empty();
         $("#loading").removeClass("d-none");
         
-        $.post("ajax.php", $(this).serialize(), function(data) {
+        $btn.prop('disabled', true);
+        $btnText.text('Buscando...');
+
+        $.post("segunda-via.php", $(this).serialize(), function(data) {
             $("#loading").addClass("d-none");
             $("#resultado").html(data).fadeIn();
+            $btn.prop('disabled', false);
+            $btnText.text('Consultar');
         }).fail(function() {
             $("#loading").addClass("d-none");
-            $("#resultado").html('<div class="alert alert-danger shadow-sm border-0"><i class="fas fa-exclamation-triangle mr-2"></i> Ops! Ocorreu um erro interno. Tente mais tarde.</div>').fadeIn();
+            $("#resultado").html('<div class="alert alert-danger shadow-sm border-0 py-3"><i class="fas fa-exclamation-triangle mr-2"></i> Ops! Ocorreu um erro interno. Tente mais tarde.</div>').fadeIn();
+            $btn.prop('disabled', false);
+            $btnText.text('Consultar');
         });
     });
 
-    // Limpar tela ao clicar em pagar/ver para evitar erros de token ou cliques duplos
-    $(document).on("click", "#resultado a.btn", function() {
-        const $resultado = $("#resultado");
-        const $loading = $("#loading");
-        
-        setTimeout(function() {
-            $resultado.fadeOut(function() {
-                $(this).empty();
-            });
-            $loading.find("p").text("Aguarde, estamos preparando seu acesso seguro...");
-            $loading.removeClass("d-none");
-
-            // Após 3 segundos, esconde o loading e avisa que abriu em outra aba
+    // Feedback visual ao processar pagamento
+    $(document).on("click", ".btn-action", function(e) {
+        const $this = $(this);
+        if($this.hasClass('btn-pay')) {
             setTimeout(function() {
-                $loading.addClass("d-none");
-                $resultado.html(`
-                    <div class="alert alert-success text-center shadow-sm border-0 py-4 animate__animated animate__fadeIn">
-                        <i class="fas fa-external-link-alt fa-2x mb-3 d-block text-success"></i>
-                        <h6 class="font-weight-bold">Fatura aberta em uma nova aba!</h6>
-                        <p class="text-muted mb-0 small">Siga as instruções na outra janela para concluir o pagamento.</p>
-                        <hr>
-                        <button type="button" class="btn btn-lg btn-primary" onclick="location.reload()">Fazer nova consulta</button>
-                    </div>
-                `).fadeIn();
-            }, 3500);
-        }, 100);
+                 $("#resultado").fadeOut();
+                 $("#loading").removeClass("d-none").find('p').text('Encaminhando para o gateway de pagamento...');
+                 
+                 setTimeout(function() {
+                     location.reload();
+                 }, 5000);
+            }, 800);
+        }
     });
 });
 </script>
