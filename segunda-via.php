@@ -8,6 +8,18 @@ use WHMCS\Database\Capsule;
 $action = $_REQUEST['action'] ?? '';
 $email = $_POST['email'] ?? '';
 
+// Configurações do Addon
+$addonConfig = Capsule::table('tbladdonmodules')->where('module', 'invoice_recovery')->pluck('value', 'setting');
+$portalEnabled = ($addonConfig['enabled'] ?? '') === 'on';
+$disableSso = ($addonConfig['disable_sso'] ?? '') === 'on';
+$enablePix = ($addonConfig['enable_pix'] ?? '') === 'on';
+$enableBoleto = ($addonConfig['enable_boleto'] ?? '') === 'on';
+$enableCartao = ($addonConfig['enable_cartao'] ?? '') === 'on';
+
+if (!$portalEnabled && !empty($email)) {
+    die('<div class="alert alert-warning text-center">O portal de 2ª via está temporariamente desativado.</div>');
+}
+
 /**
  * Ação de Pagamento (UpdateInvoice + Redirect)
  */
@@ -23,16 +35,18 @@ if ($action === 'pay') {
     $adminUser = Capsule::table('tbladmins')->where('disabled', 0)->value('username');
     localAPI('UpdateInvoice', ['invoiceid' => $invoiceId, 'paymentmethod' => $gateway], $adminUser);
 
-    // 3. Gerar Login SSO para a fatura com flag de restrição
-    $results = localAPI('CreateSsoToken', [
-        'client_id' => $userid,
-        'destination' => 'sso:custom_redirect',
-        'sso_redirect_path' => 'viewinvoice.php?id=' . $invoiceId . '&restricted=1'
-    ], $adminUser);
+    // 3. Gerar Login SSO para a fatura com flag de restrição (se não estiver desativado)
+    if (!$disableSso) {
+        $results = localAPI('CreateSsoToken', [
+            'client_id' => $userid,
+            'destination' => 'sso:custom_redirect',
+            'sso_redirect_path' => 'viewinvoice.php?id=' . $invoiceId . '&restricted=1'
+        ], $adminUser);
 
-    if ($results['result'] == 'success') {
-        header("Location: " . $results['redirect_url'] . '&restricted=1');
-        exit;
+        if ($results['result'] == 'success') {
+            header("Location: " . $results['redirect_url'] . '&restricted=1');
+            exit;
+        }
     }
 
     header("Location: viewinvoice.php?id=" . $invoiceId);
@@ -96,7 +110,7 @@ if (!empty($email)) {
         $adminUser = Capsule::table('tbladmins')->where('disabled', 0)->value('username');
         $viewLink = "viewinvoice.php?id=" . $f->id;
         
-        if ($adminUser) {
+        if ($adminUser && !$disableSso) {
             $results = localAPI('CreateSsoToken', [
                 'client_id' => $cliente->id,
                 'destination' => 'sso:custom_redirect',
@@ -107,8 +121,13 @@ if (!empty($email)) {
             }
         }
 
-        $payPixLink = "segunda-via.php?action=pay&invoiceid={$f->id}&gateway=bancointer_pix";
-        $payCreditCardLink = "segunda-via.php?action=pay&invoiceid={$f->id}&gateway=gofasiugucartao";
+        $pixGateway = $addonConfig['pix_gateway_id'] ?? 'bancointer_pix';
+        $ccGateway = $addonConfig['cc_gateway_id'] ?? 'gofasiugucartao';
+        $boletoGateway = $addonConfig['boleto_gateway_id'] ?? '';
+
+        $payPixLink = "segunda-via.php?action=pay&invoiceid={$f->id}&gateway={$pixGateway}";
+        $payCreditCardLink = "segunda-via.php?action=pay&invoiceid={$f->id}&gateway={$ccGateway}";
+        $payBoletoLink = "segunda-via.php?action=pay&invoiceid={$f->id}&gateway={$boletoGateway}";
 
         echo "
         <div class='invoice-card-custom animate-fade-in'>
@@ -117,11 +136,21 @@ if (!empty($email)) {
                 <p>Vencimento: <strong>{$duedate}</strong> | Total: <strong>R$ {$total}</strong></p>
             </div>
             <div class='invoice-btns'>
-                <a href='{$viewLink}' target='_blank' class='btn-act btn-act-light'><i class='fas fa-eye'></i> Ver</a>
-                <a href='{$payPixLink}' target='_blank' class='btn-act btn-act-primary btn-pay'><i class='fas fa-qrcode'></i> PIX</a>
-                <a href='{$payCreditCardLink}' target='_blank' class='btn-act btn-act-primary btn-pay'><i class='fas fa-credit-card'></i> Cartão</a>
-            </div>
-        </div>";
+                <a href='{$viewLink}' target='_blank' class='btn-act btn-act-light'><i class='fas fa-eye'></i> Ver</a>";
+        
+        if ($enablePix) {
+            echo "<a href='{$payPixLink}' target='_blank' class='btn-act btn-act-primary btn-pay'><i class='fas fa-qrcode'></i> PIX</a>";
+        }
+
+        if ($enableBoleto && $boletoGateway) {
+            echo "<a href='{$payBoletoLink}' target='_blank' class='btn-act btn-act-primary btn-pay'><i class='fas fa-barcode'></i> Boleto</a>";
+        }
+        
+        if ($enableCartao) {
+            echo "<a href='{$payCreditCardLink}' target='_blank' class='btn-act btn-act-primary btn-pay'><i class='fas fa-credit-card'></i> Cartão</a>";
+        }
+        
+        echo "</div></div>";
     }
 
     echo '</div>';

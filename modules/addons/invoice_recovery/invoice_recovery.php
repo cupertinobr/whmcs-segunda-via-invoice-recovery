@@ -7,18 +7,25 @@ if (!defined("WHMCS")) {
 
 function invoice_recovery_config() {
     $customFields = [];
+    $gateways = [];
     try {
+        // Buscar campos personalizados
         $fields = Capsule::table('tblcustomfields')
             ->where('type', 'client')
             ->orderBy('fieldname', 'asc')
             ->get();
-
         foreach ($fields as $field) {
             $customFields[$field->id] = $field->fieldname;
         }
-    } catch (\Exception $e) {
-        // Fallback caso ocorra algum erro na consulta
-    }
+
+        // Buscar gateways ativos
+        $gatewayRows = Capsule::table('tblpaymentgateways')
+            ->where('setting', 'name')
+            ->get();
+        foreach ($gatewayRows as $row) {
+            $gateways[$row->gateway] = $row->value;
+        }
+    } catch (\Exception $e) { }
 
     return [
         "name" => "Invoice Recovery Pro",
@@ -36,8 +43,27 @@ function invoice_recovery_config() {
                 "Options" => $customFields,
                 "Description" => "Selecione o campo personalizado que contém o CPF ou CNPJ do cliente.",
             ],
-            "api_identifier" => ["FriendlyName"=>"API Identifier","Type"=>"text", "Description" => "Gerado em Setup > Staff Management > API Credentials"],
-            "api_secret" => ["FriendlyName"=>"API Secret","Type"=>"password", "Description" => "Gerado em Setup > Staff Management > API Credentials"],
+            "pix_gateway_id" => [
+                "FriendlyName" => "Gateway PIX",
+                "Type" => "dropdown",
+                "Options" => $gateways,
+                "Description" => "Selecione o gateway que será usado para o botão PIX.",
+            ],
+            "boleto_gateway_id" => [
+                "FriendlyName" => "Gateway Boleto",
+                "Type" => "dropdown",
+                "Options" => $gateways,
+                "Description" => "Selecione o gateway que será usado para o botão Boleto.",
+            ],
+            "cc_gateway_id" => [
+                "FriendlyName" => "Gateway Cartão",
+                "Type" => "dropdown",
+                "Options" => $gateways,
+                "Description" => "Selecione o gateway que será usado para o botão Cartão.",
+            ],
+            "api_identifier" => ["FriendlyName"=>"API Identifier","Type"=>"text", "Description" => "System Settings > API & Security > <a href=\"configapicredentials.php\" target=\"_blank\">API Credentials</a>"],
+            "api_secret" => ["FriendlyName"=>"API Secret","Type"=>"password", "Description" => "System Settings > API & Security > <a href=\"configapicredentials.php\" target=\"_blank\">API Credentials</a>"],
+            "disable_sso" => ["FriendlyName" => "Desativar Login Automático", "Type" => "yesno", "Description" => "Se marcado, o cliente não será logado automaticamente ao acessar ou pagar faturas."],
         ]
     ];
 }
