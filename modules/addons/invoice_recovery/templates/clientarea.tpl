@@ -1,13 +1,11 @@
 <div class="recovery-container">
-   
-
     <div class="recovery-card">
         <div class="badge-container">
             <span class="recovery-badge">SEGUNDA VIA</span>
         </div>
         
         <h2 class="card-title">Consulte suas faturas</h2>
-        <p class="card-subtitle">Digite o e-mail cadastrado na sua conta para visualizar faturas em aberto e realizar pagamentos.</p>
+        <p class="card-subtitle">Digite o e-mail cadastrado na sua conta para visualizar faturas em aberto.</p>
 
         <form id="formBusca" class="recovery-form">
             <div class="input-wrapper">
@@ -25,10 +23,7 @@
         </div> -->
     </div>
 
-    <div class="ip-info-banner">
-        <i class="fas fa-fingerprint"></i>
-        <p>Ambiente seguro — seu acesso (IPv4: <span id="user-ip">...</span>) é registrado para sua proteção.</p>
-    </div>
+    
 
     <div id="loading" class="text-center mt-5 d-none">
         <div class="spinner-border text-success mb-3" role="status" style="width: 3rem; height: 3rem;">
@@ -37,7 +32,12 @@
         <p class="text-muted font-italic">Localizando faturas...</p>
     </div>
 
-    <div id="resultado" class="mt-4"></div>
+    <div id="resultado" class="mt-5"></div>
+  
+  <div class="ip-info-banner">
+        <i class="fas fa-fingerprint"></i>
+        <p>Ambiente seguro — seu acesso (IPv4: <span id="user-ip">...</span>) é registrado para sua proteção.</p>
+    </div>
 </div>
 
 <style>
@@ -64,12 +64,12 @@
 }
 
 .recovery-card {
-    background: #fff;
+    /* background: #fff; */
     border-radius: 20px;
-    padding: 60px 40px;
+    padding: 20px 20px;
     text-align: center;
-    color: #fff;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    /* color: #fff; */
+    box-shadow: 0 0 45px rgba(0,0,0,0.4);
 }
 
 .badge-container {
@@ -135,7 +135,7 @@
 .input-group-custom input {
     background: transparent;
     border: none;
-    color: #fff;
+    color: #fff; 
     width: 100%;
     height: 45px;
     outline: none;
@@ -144,7 +144,7 @@
 
 .btn-consultar {
     background: #7643C9;
-    color: #fff;
+    /* color: #fff; */
     border: none;
     padding: 0 30px;
     height: 48px;
@@ -175,7 +175,7 @@
 }
 
 .ip-info-banner {
-    background: #fdfdfd;
+    /*background: #fdfdfd;*/
     border: 1px solid #eee;
     border-radius: 12px;
     padding: 15px 25px;
@@ -272,6 +272,34 @@ $(document).ready(function() {
             $("#loading").addClass("d-none");
             $("#resultado").html('<div class="alert alert-danger shadow-sm border-0"><i class="fas fa-exclamation-triangle mr-2"></i> Ops! Ocorreu um erro interno. Tente mais tarde.</div>').fadeIn();
         });
+    });
+
+    // Limpar tela ao clicar em pagar/ver para evitar erros de token ou cliques duplos
+    $(document).on("click", "#resultado a.btn", function() {
+        const $resultado = $("#resultado");
+        const $loading = $("#loading");
+        
+        setTimeout(function() {
+            $resultado.fadeOut(function() {
+                $(this).empty();
+            });
+            $loading.find("p").text("Aguarde, estamos preparando seu acesso seguro...");
+            $loading.removeClass("d-none");
+
+            // Após 3 segundos, esconde o loading e avisa que abriu em outra aba
+            setTimeout(function() {
+                $loading.addClass("d-none");
+                $resultado.html(`
+                    <div class="alert alert-success text-center shadow-sm border-0 py-4 animate__animated animate__fadeIn">
+                        <i class="fas fa-external-link-alt fa-2x mb-3 d-block text-success"></i>
+                        <h6 class="font-weight-bold">Fatura aberta em uma nova aba!</h6>
+                        <p class="text-muted mb-0 small">Siga as instruções na outra janela para concluir o pagamento.</p>
+                        <hr>
+                        <button type="button" class="btn btn-lg btn-primary" onclick="location.reload()">Fazer nova consulta</button>
+                    </div>
+                `).fadeIn();
+            }, 3500);
+        }, 100);
     });
 });
 </script>

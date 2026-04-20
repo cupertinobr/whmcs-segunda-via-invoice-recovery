@@ -34,8 +34,8 @@ function invoice_recovery_config() {
                 "Options" => $customFields,
                 "Description" => "Selecione o campo personalizado que contém o CPF ou CNPJ do cliente.",
             ],
-            "whatsapp_token" => ["FriendlyName"=>"Token Z-API","Type"=>"text"],
-            "whatsapp_instance" => ["FriendlyName"=>"Instance ID","Type"=>"text"],
+            "api_identifier" => ["FriendlyName"=>"API Identifier","Type"=>"text", "Description" => "Gerado em Setup > Staff Management > API Credentials"],
+            "api_secret" => ["FriendlyName"=>"API Secret","Type"=>"password", "Description" => "Gerado em Setup > Staff Management > API Credentials"],
         ]
     ];
 }
@@ -44,13 +44,13 @@ function invoice_recovery_output($vars) {
 
     echo "<h2>📊 Dashboard Invoice Recovery</h2>";
 
-    $total = Capsule::table('mod_invoice_recovery_logs')->sum('amount');
-    $count = Capsule::table('mod_invoice_recovery_logs')->count();
+    // $total = Capsule::table('mod_invoice_recovery_logs')->sum('amount');
+    // $count = Capsule::table('mod_invoice_recovery_logs')->count();
 
-    echo "<div style='display:flex;gap:20px'>
-        <div class='card p-3'>💰 R$ {$total}</div>
-        <div class='card p-3'>📊 {$count} ações</div>
-    </div>";
+    // echo "<div style='display:flex;gap:20px'>
+    //     <div class='card p-3'>💰 R$ {$total}</div>
+    //     <div class='card p-3'>📊 {$count} ações</div>
+    // </div>";
 
     echo "<hr><p>Dashboard avançado ativo ✔️</p>";
 }
