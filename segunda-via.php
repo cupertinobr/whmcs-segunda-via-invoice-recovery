@@ -15,10 +15,10 @@ if ($action === 'pay') {
     $invoiceId = (int)$_GET['invoiceid'];
     $gateway = $_GET['gateway'] ?? 'pix';
 
-    // 1. Buscar informações da fatura
-    $invoice = Capsule::table('tblinvoices')->where('id', $invoiceId)->first();
+    // 1. Buscar informações da fatura para obter o UserID
+    $userid = Capsule::table('tblinvoices')->where('id', $invoiceId)->value('userid');
     
-    if (!$invoice) {
+    if (!$userid) {
         die('Fatura não encontrada.');
     }
 
@@ -31,9 +31,11 @@ if ($action === 'pay') {
         'paymentmethod' => $gateway
     ), $adminUser);
 
-    // 4. Gerar token SSO para acesso sem login
+    // 4. Definir flag de acesso restrito e gerar SSO
+    $_SESSION['invoice_recovery_only'] = true;
+
     $results = localAPI('CreateSsoToken', array(
-        'client_id' => $invoice->userid,
+        'client_id' => $userid,
         'destination' => 'sso:custom_redirect',
         'sso_redirect_path' => 'viewinvoice.php?id=' . $invoiceId
     ), $adminUser);
@@ -66,7 +68,6 @@ if (!empty($email)) {
     }
 
     // 2. Verificar se a 2ª Via está desativada para este cliente
-    // Procuramos por um campo personalizado chamado "Desativar 2ª Via"
     $isDisabled = Capsule::table('tblcustomfieldsvalues')
         ->join('tblcustomfields', 'tblcustomfields.id', '=', 'tblcustomfieldsvalues.fieldid')
         ->where('tblcustomfields.type', 'client')
@@ -78,25 +79,9 @@ if (!empty($email)) {
         die('<div class="alert alert-warning shadow-sm border-0 py-3 animate-fade-in text-center">
                 <i class="fas fa-user-lock fa-2x mb-3 d-block text-warning"></i>
                 <h6 class="font-weight-bold">Acesso Restrito</h6>
-                <p class="mb-0 small">Identificamos que o acesso simplificado está desativado para sua conta.<br>Por favor, acesse a Área do Cliente com sua senha ou contate o suporte.</p>
+                <p class="mb-0 small">Identificamos que o acesso simplificado está desativado para sua conta.</p>
              </div>');
     }
-
-    /**
-     * Função auxiliar para gerar link SSO
-     */
-    $getSsoUrl = function($invoiceId, $clientId) {
-        $adminUser = Capsule::table('tbladmins')->where('disabled', 0)->value('username');
-        if (!$adminUser) return "viewinvoice.php?id=" . $invoiceId;
-
-        $results = localAPI('CreateSsoToken', array(
-            'client_id' => $clientId,
-            'destination' => 'sso:custom_redirect',
-            'sso_redirect_path' => 'viewinvoice.php?id=' . $invoiceId
-        ), $adminUser);
-
-        return ($results['result'] == 'success') ? $results['redirect_url'] : "viewinvoice.php?id=" . $invoiceId;
-    };
 
     // Buscar faturas do cliente
     $faturas = Capsule::table('tblinvoices')
@@ -106,43 +91,46 @@ if (!empty($email)) {
         ->get();
 
     if ($faturas->isEmpty()) {
-        echo '<div class="alert alert-info text-center">
-                <i class="fas fa-check-circle fa-2x mb-3 d-block"></i>
-                Parabéns, não encontramos faturas pendentes.
-              </div>';
+        echo '<div class="alert alert-info text-center">Parabéns, não encontramos faturas pendentes.</div>';
         exit;
     }
 
-    echo '<h5 class="mb-3 mt-2">Olá, ' . $cliente->firstname . '. Encontramos as seguintes faturas:</h5>';
+    echo '<h5 class="mb-3 mt-2">Olá, ' . $cliente->firstname . '. Escolha uma fatura:</h5>';
     echo '<div class="list-group shadow-sm">';
 
     foreach ($faturas as $f) {
         $duedate = date('d/m/Y', strtotime($f->duedate));
         $total = number_format($f->total, 2, ',', '.');
         
-        // Link SSO (Apenas visualização)
-        $viewLink = $getSsoUrl($f->id, $cliente->id);
+        // Ativar flag antes de gerar links
+        $_SESSION['invoice_recovery_only'] = true;
+
+        // Gerar link SSO (Visualização)
+        $adminUser = Capsule::table('tbladmins')->where('disabled', 0)->value('username');
+        $viewLink = "viewinvoice.php?id=" . $f->id;
         
-        // Links de Pagamento
+        if ($adminUser) {
+            $results = localAPI('CreateSsoToken', array(
+                'client_id' => $cliente->id,
+                'destination' => 'sso:custom_redirect',
+                'sso_redirect_path' => 'viewinvoice.php?id=' . $f->id
+            ), $adminUser);
+            if ($results['result'] == 'success') $viewLink = $results['redirect_url'];
+        }
+        
         $payPixLink = "segunda-via.php?action=pay&invoiceid={$f->id}&gateway=bancointer_pix";
         $payCreditCardLink = "segunda-via.php?action=pay&invoiceid={$f->id}&gateway=gofasiugucartao";
 
         echo "
-        <div class='invoice-card animate-fade-in'>
-            <div class='invoice-info'>
-                <h4>Fatura #{$f->id}</h4>
-                <p>Vencimento: <strong>{$duedate}</strong> • Total: <strong class='text-primary'>R$ {$total}</strong></p>
+        <div class='invoice-card-custom animate-fade-in'>
+            <div class='invoice-meta'>
+                <h5>Fatura #{$f->id}</h5>
+                <p>Vencimento: <strong>{$duedate}</strong> | Total: <strong>R$ {$total}</strong></p>
             </div>
-            <div class='invoice-actions'>
-                <a href='{$viewLink}' target='_blank' class='btn-action btn-secondary btn-view'>
-                    <i class='fas fa-eye'></i> Ver
-                </a>
-                <a href='{$payPixLink}' target='_blank' class='btn-action btn-primary-new btn-pay'>
-                    <i class='fas fa-qrcode'></i> PIX
-                </a>
-                <a href='{$payCreditCardLink}' target='_blank' class='btn-action btn-primary-new btn-pay'>
-                    <i class='fas fa-credit-card'></i> Cartão
-                </a>
+            <div class='invoice-btns'>
+                <a href='{$viewLink}' target='_blank' class='btn-act btn-act-light'><i class='fas fa-eye'></i> Ver</a>
+                <a href='{$payPixLink}' target='_blank' class='btn-act btn-act-primary btn-pay'><i class='fas fa-qrcode'></i> PIX</a>
+                <a href='{$payCreditCardLink}' target='_blank' class='btn-act btn-act-primary btn-pay'><i class='fas fa-credit-card'></i> Cartão</a>
             </div>
         </div>";
     }
