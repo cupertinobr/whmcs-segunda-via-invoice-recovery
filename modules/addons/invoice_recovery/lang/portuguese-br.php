@@ -1,11 +1,7 @@
 <?php
-/**
- * Sample addon module language file.
- * Language: English
- */
-$_ADDONLANG['title_recovery'] = "2ª Via de Fatura(s)";
+$_ADDONLANG['title_recovery'] = "2ª Via de Faturas";
 $_ADDONLANG['search_title'] = "Consulte suas faturas";
-$_ADDONLANG['search_desc'] = "Informe seu E-mail ou CPF/CNPJ para listar suas faturas pendentes.";
+$_ADDONLANG['search_desc'] = "Informe seu E-mail ou CPF/CNPJ para buscar suas faturas em aberto.";
 $_ADDONLANG['input_placeholder'] = "E-mail ou CPF/CNPJ";
 $_ADDONLANG['btn_search'] = "Consultar";
 $_ADDONLANG['loading_find'] = "Estamos localizando suas faturas...";

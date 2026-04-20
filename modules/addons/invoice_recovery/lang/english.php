@@ -5,7 +5,7 @@
  */
 $_ADDONLANG['title_recovery'] = "INVOICE RECOVERY";
 $_ADDONLANG['search_title'] = "Check your invoices";
-$_ADDONLANG['search_desc'] = "Enter your Email or ID Number to list your pending invoices.";
+$_ADDONLANG['search_desc'] = "Enter your Email or ID Number to search for your open invoices.";
 $_ADDONLANG['input_placeholder'] = "Email or ID Number";
 $_ADDONLANG['btn_search'] = "Search";
 $_ADDONLANG['loading_find'] = "Locating your invoices...";
