@@ -92,36 +92,45 @@ if ($action === 'pay') {
  * Lógica de Busca de Faturas (via POST)
  */
 if (!empty($documento)) {
-    $docLimpo = preg_replace('/[^0-9]/', '', $documento);
-    
-    // 1. Validar CPF ou CNPJ
-    if (!validarCPF($docLimpo) && !validarCNPJ($docLimpo)) {
-        die('<div class="alert alert-danger shadow-sm border-0 py-3 animate-fade-in text-center">
-                <i class="fas fa-exclamation-circle fa-2x mb-3 d-block text-danger"></i>
-                <h6 class="font-weight-bold">Documento Inválido</h6>
-                <p class="mb-0 small">O CPF ou CNPJ informado não é válido. Verifique os números e tente novamente.</p>
-             </div>');
-    }
+    $cliente = null;
+    $inputRaw = trim($documento);
 
-    // 2. Buscar o cliente pelo campo personalizado configurado
-    $cpfFieldId = (int)($addonConfig['cpf_field_id'] ?? 0);
-    
-    if (!$cpfFieldId) {
-        die('<div class="alert alert-danger text-center">Configuração incompleta: Campo de CPF não definido no módulo.</div>');
-    }
+    // 1. Verificar se é E-mail
+    if (filter_var($inputRaw, FILTER_VALIDATE_EMAIL)) {
+        $cliente = Capsule::table('tblclients')
+            ->where('email', $inputRaw)
+            ->select('tblclients.id', 'tblclients.firstname', 'tblclients.lastname', 'tblclients.email')
+            ->first();
+    } else {
+        // 2. Tentar como CPF ou CNPJ
+        $docLimpo = preg_replace('/[^0-9]/', '', $inputRaw);
+        
+        if (!validarCPF($docLimpo) && !validarCNPJ($docLimpo)) {
+            die('<div class="alert alert-danger shadow-sm border-0 py-3 animate-fade-in text-center">
+                    <i class="fas fa-exclamation-circle fa-2x mb-3 d-block text-danger"></i>
+                    <h6 class="font-weight-bold">Dados Inválidos</h6>
+                    <p class="mb-0 small">O E-mail ou CPF/CNPJ informado não é válido. Verifique e tente novamente.</p>
+                 </div>');
+        }
 
-    $cliente = Capsule::table('tblcustomfieldsvalues')
-        ->join('tblclients', 'tblclients.id', '=', 'tblcustomfieldsvalues.relid')
-        ->where('tblcustomfieldsvalues.fieldid', $cpfFieldId)
-        ->where('tblcustomfieldsvalues.value', $docLimpo)
-        ->select('tblclients.id', 'tblclients.firstname', 'tblclients.lastname', 'tblclients.email')
-        ->first();
+        $cpfFieldId = (int)($addonConfig['cpf_field_id'] ?? 0);
+        if (!$cpfFieldId) {
+            die('<div class="alert alert-danger text-center">Configuração incompleta: Campo de CPF não definido no módulo.</div>');
+        }
+
+        $cliente = Capsule::table('tblcustomfieldsvalues')
+            ->join('tblclients', 'tblclients.id', '=', 'tblcustomfieldsvalues.relid')
+            ->where('tblcustomfieldsvalues.fieldid', $cpfFieldId)
+            ->where('tblcustomfieldsvalues.value', $docLimpo)
+            ->select('tblclients.id', 'tblclients.firstname', 'tblclients.lastname', 'tblclients.email')
+            ->first();
+    }
 
     if (!$cliente) {
         die('<div class="alert alert-danger shadow-sm border-0 py-3 animate-fade-in text-center">
                 <i class="fas fa-user-times fa-2x mb-3 d-block text-danger"></i>
                 <h6 class="font-weight-bold">Não Encontrado</h6>
-                <p class="mb-0 small">Não encontramos nenhum cliente cadastrado com este documento.</p>
+                <p class="mb-0 small">Não encontramos nenhum cliente com os dados informados.</p>
              </div>');
     }
 

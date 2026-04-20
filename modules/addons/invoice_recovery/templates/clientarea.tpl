@@ -4,14 +4,14 @@
         <header class="recovery-header text-center">
             <span class="view-badge">2ª VIA DE FATURA</span>
             <h1 class="view-title">Consulte suas faturas</h1>
-            <p class="view-desc">Informe seu CPF ou CNPJ para listar suas faturas pendentes.</p>
+            <p class="view-desc">Informe seu E-mail ou CPF/CNPJ para listar suas faturas pendentes.</p>
         </header>
 
         <div class="search-card">
             <form id="formBusca" class="search-form">
                 <div class="input-box">
-                    <i class="fas fa-id-card"></i>
-                    <input type="text" name="documento" id="documentoInput" placeholder="000.000.000-00" required maxlength="18">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="documento" id="documentoInput" placeholder="E-mail ou CPF/CNPJ" required>
                 </div>
                 <button type="submit" class="btn-primary-custom btn-submit">
                     <span class="btn-text">Consultar</span>
@@ -44,9 +44,9 @@ $(document).ready(function() {
         $("#user-ip").text(data.ip);
     });
 
-    // Filtro para aceitar apenas números e caracteres de formatação
+    // Filtro para aceitar apenas caracteres válidos para busca (números, letras, @, pontos)
     $("#documentoInput").on("input", function() {
-        this.value = this.value.replace(/[^0-9.\-\/]/g, "");
+        this.value = this.value.replace(/[^0-9a-zA-Z.@\-\/]/g, "");
     });
 
     $("#formBusca").on("submit", function(e) {
