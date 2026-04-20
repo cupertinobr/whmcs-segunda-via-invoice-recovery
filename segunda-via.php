@@ -15,33 +15,23 @@ if ($action === 'pay') {
     $invoiceId = (int)$_GET['invoiceid'];
     $gateway = $_GET['gateway'] ?? 'pix';
 
-    // 1. Buscar informações da fatura para obter o UserID
+    // 1. Buscar UserID
     $userid = Capsule::table('tblinvoices')->where('id', $invoiceId)->value('userid');
-    
-    if (!$userid) {
-        die('Fatura não encontrada.');
-    }
+    if (!$userid) die('Fatura não encontrada.');
 
-    // 2. Buscar um administrador para a API
+    // 2. Atualizar Gateway via Admin API
     $adminUser = Capsule::table('tbladmins')->where('disabled', 0)->value('username');
+    localAPI('UpdateInvoice', ['invoiceid' => $invoiceId, 'paymentmethod' => $gateway], $adminUser);
 
-    // 3. Atualizar o método de pagamento via localAPI
-    localAPI('UpdateInvoice', array(
-        'invoiceid' => $invoiceId,
-        'paymentmethod' => $gateway
-    ), $adminUser);
-
-    // 4. Definir flag de acesso restrito e gerar SSO
-    $_SESSION['invoice_recovery_only'] = true;
-
-    $results = localAPI('CreateSsoToken', array(
+    // 3. Gerar Login SSO para a fatura com flag de restrição
+    $results = localAPI('CreateSsoToken', [
         'client_id' => $userid,
         'destination' => 'sso:custom_redirect',
-        'sso_redirect_path' => 'viewinvoice.php?id=' . $invoiceId
-    ), $adminUser);
+        'sso_redirect_path' => 'viewinvoice.php?id=' . $invoiceId . '&restricted=1'
+    ], $adminUser);
 
     if ($results['result'] == 'success') {
-        header("Location: " . $results['redirect_url']);
+        header("Location: " . $results['redirect_url'] . '&restricted=1');
         exit;
     }
 
@@ -95,29 +85,28 @@ if (!empty($email)) {
         exit;
     }
 
-    echo '<h5 class="mb-3 mt-2">Olá, ' . $cliente->firstname . '. Escolha uma fatura:</h5>';
+    echo '<h5 class="mb-3 mt-2">Faturas não pagas:</h5>';
     echo '<div class="list-group shadow-sm">';
 
     foreach ($faturas as $f) {
         $duedate = date('d/m/Y', strtotime($f->duedate));
         $total = number_format($f->total, 2, ',', '.');
         
-        // Ativar flag antes de gerar links
-        $_SESSION['invoice_recovery_only'] = true;
-
-        // Gerar link SSO (Visualização)
+        // Gerar Link SSO com trava de restrição
         $adminUser = Capsule::table('tbladmins')->where('disabled', 0)->value('username');
         $viewLink = "viewinvoice.php?id=" . $f->id;
         
         if ($adminUser) {
-            $results = localAPI('CreateSsoToken', array(
+            $results = localAPI('CreateSsoToken', [
                 'client_id' => $cliente->id,
                 'destination' => 'sso:custom_redirect',
-                'sso_redirect_path' => 'viewinvoice.php?id=' . $f->id
-            ), $adminUser);
-            if ($results['result'] == 'success') $viewLink = $results['redirect_url'];
+                'sso_redirect_path' => 'viewinvoice.php?id=' . $f->id . '&restricted=1'
+            ], $adminUser);
+            if ($results['result'] == 'success') {
+                $viewLink = $results['redirect_url'] . '&restricted=1';
+            }
         }
-        
+
         $payPixLink = "segunda-via.php?action=pay&invoiceid={$f->id}&gateway=bancointer_pix";
         $payCreditCardLink = "segunda-via.php?action=pay&invoiceid={$f->id}&gateway=gofasiugucartao";
 
