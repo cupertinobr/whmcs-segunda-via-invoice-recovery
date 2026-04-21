@@ -47,7 +47,7 @@ function invoice_recovery_config() {
                 "FriendlyName" => "Campo Bloqueio",
                 "Type" => "dropdown",
                 "Options" => $customFields,
-                "Description" => "Selecione o campo (Sim/Não) que bloqueia o acesso deste cliente à 2ª via.",
+                "Description" => "Selecione o campo (Sim/Não) que bloqueia o acesso deste cliente à 2ª via.<br><a href=\"addonmodules.php?module=invoice_recovery&action=create_block_field\">Clique aqui para criar o campo automaticamente</a>",
             ],
             "pix_gateway_id" => [
                 "FriendlyName" => "Gateway PIX",
@@ -96,8 +96,40 @@ function invoice_recovery_activate()
 
 
 function invoice_recovery_output($vars) {
+    $action = $_GET['action'] ?? '';
+
+    if ($action === 'create_block_field') {
+        try {
+            $fieldName = 'Desativar 2ª Via';
+            $exists = Capsule::table('tblcustomfields')
+                ->where('type', 'client')
+                ->where('fieldname', $fieldName)
+                ->exists();
+
+            if (!$exists) {
+                Capsule::table('tblcustomfields')->insert([
+                    'type' => 'client',
+                    'relid' => 0,
+                    'fieldname' => $fieldName,
+                    'fieldtype' => 'tickbox',
+                    'description' => 'Marque para bloquear o acesso deste cliente ao portal de 2ª via.',
+                    'adminonly' => 'on',
+                    'required' => '',
+                    'showorder' => 'on',
+                    'showinvoice' => '',
+                    'sortorder' => 0
+                ]);
+                echo '<div class="alert alert-success">Campo personalizado "<strong>' . $fieldName . '</strong>" criado com sucesso como (Apenas Admin). <a href="configaddonmods.php">Voltar para configurações</a></div>';
+            } else {
+                echo '<div class="alert alert-info">O campo "<strong>' . $fieldName . '</strong>" já existe no sistema. <a href="configaddonmods.php">Voltar para configurações</a></div>';
+            }
+        } catch (\Exception $e) {
+            echo '<div class="alert alert-danger">Erro ao criar campo: ' . $e->getMessage() . '</div>';
+        }
+    }
 
     echo "<h2>📊 Dashboard Invoice Recovery</h2>";
+
 
     // $total = Capsule::table('mod_invoice_recovery_logs')->sum('amount');
     // $count = Capsule::table('mod_invoice_recovery_logs')->count();
