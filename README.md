@@ -63,3 +63,6 @@ Para o funcionamento correto das funções de pagamento e SSO:
   * `/hooks/`: Hooks de segurança para restrição de sessão.
 
 ---
+
+## ☕ Apoie o Projeto
+Se este módulo foi útil para você, considere apoiar o seu desenvolvimento contínuo fazendo uma doação via **PIX** para a chave: `pix@cupertino.deb.br`
