@@ -11,16 +11,13 @@ add_hook('ClientAreaHeadOutput', 1, function($vars) {
     if ($isRestricted) {
         return "
         <style id='restrictedModeStyle'>
-            /* Ocultar elementos de navegação, sidebars, headers e footers genericamente */
-            header, footer, aside, nav, 
+            /* Ocultar elementos de navegação lateral, topo e rodapé de forma específica */
             .sidebar, .breadcrumb, .navbar, .main-navigation, 
             .navigation, .user-controls, .account-links,
             .header-nav, .left-sidebar, .right-sidebar,
-            #main-menu, #primary-nav, #secondary-nav,
-            .topbar, .footer-area, .site-header, .site-footer,
-            [class*='header'], [class*='footer'], [class*='sidebar'],
-            [id*='header'], [id*='footer'], [id*='sidebar'],
-            [id*='menu'], [id*='nav'] { 
+            #main-menu, #primary-nav, #secondary-nav, .topbar, .top-nav,
+            .footer-area, .site-header, .site-footer,
+            #header, #footer, #sidebar, header, footer, aside, nav { 
                 display: none !important; 
                 visibility: hidden !important; 
                 opacity: 0 !important; 
@@ -28,18 +25,30 @@ add_hook('ClientAreaHeadOutput', 1, function($vars) {
                 overflow: hidden !important;
                 pointer-events: none !important; 
             }
-            body { padding-top: 0 !important; margin-top: 0 !important; }
-            /* Garantir que o conteúdo principal ocupe a tela toda */
-            .main-content, #main-body, .page-main { 
-                margin: 0 !important; 
+            
+            body { padding-top: 0 !important; margin-top: 0 !important; background: #fff !important; }
+            
+            /* Garantir que o conteúdo da fatura e os botões de pagamento SEJAM visíveis */
+            .main-content, #main-body, .page-main, .invoice-container, .view-invoice, .payment-btn-container { 
+                margin: 0 auto !important; 
                 padding: 20px !important; 
                 width: 100% !important; 
-                max-width: 100% !important; 
-                left: 0 !important; 
+                max-width: 1000px !important; 
                 display: block !important;
                 visibility: visible !important;
                 opacity: 1 !important;
+                height: auto !important;
+                pointer-events: auto !important;
             }
+            
+            /* Impedir que seletores internos da fatura que usem nomes genéricos sejam escondidos */
+            .invoice-container div, .invoice-container section, .invoice-container header, .invoice-container footer {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                height: auto !important;
+            }
+
             .container { width: 100% !important; max-width: 1200px !important; }
         </style>
         <script>
