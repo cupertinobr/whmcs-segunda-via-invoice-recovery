@@ -64,6 +64,8 @@ function invoice_recovery_config() {
             "api_identifier" => ["FriendlyName"=>"API Identifier","Type"=>"text", "Description" => "System Settings > API & Security > <a href=\"configapicredentials.php\" target=\"_blank\">API Credentials</a>"],
             "api_secret" => ["FriendlyName"=>"API Secret","Type"=>"password", "Description" => "System Settings > API & Security > <a href=\"configapicredentials.php\" target=\"_blank\">API Credentials</a>"],
             "disable_sso" => ["FriendlyName" => "Desativar Login Automático", "Type" => "yesno", "Description" => "Se marcado, o cliente não será logado automaticamente ao acessar ou pagar faturas."],
+            "limit_attempts" => ["FriendlyName" => "Limite de Tentativas", "Type" => "text", "Size" => "3", "Default" => "5", "Description" => "Número máximo de consultas mal-sucedidas permitidas antes do bloqueio."],
+            "lockout_time" => ["FriendlyName" => "Tempo de Bloqueio (min)", "Type" => "text", "Size" => "3", "Default" => "15", "Description" => "Tempo em minutos que o visitante ficará bloqueado após atingir o limite."],
         ]
     ];
 }
@@ -71,31 +73,17 @@ function invoice_recovery_config() {
 
 function invoice_recovery_activate()
 {
-    // Create custom tables and schema required by your module
     try {
-        // Capsule::schema()
-        //     ->create(
-        //         'mod_addonexample',
-        //         function ($table) {
-        //             /** @var \Illuminate\Database\Schema\Blueprint $table */
-        //             $table->increments('id');
-        //             $table->text('demo');
-        //         }
-        //     );
-
-        // return [
-        //     // Supported values here include: success, error or info
-        //     'status' => 'success',
-        //     'description' => 'This is a demo module only. '
-        //         . 'In a real module you might report a success or instruct a '
-        //             . 'user how to get started with it here.',
-        // ];
+        if (!Capsule::schema()->hasTable('mod_invoice_recovery_attempts')) {
+            Capsule::schema()->create('mod_invoice_recovery_attempts', function ($table) {
+                $table->string('ip', 45)->primary();
+                $table->integer('attempts')->default(0);
+                $table->timestamp('last_attempt')->useCurrent();
+            });
+        }
+        return ['status' => 'success', 'description' => 'Módulo ativado com sucesso e tabela de limites criada.'];
     } catch (\Exception $e) {
-        return [
-            // Supported values here include: success, error or info
-            'status' => "error",
-            'description' => 'Unable to create mod_addonexample: ' . $e->getMessage(),
-        ];
+        return ['status' => "error", 'description' => 'Erro ao criar tabela: ' . $e->getMessage()];
     }
 }
 

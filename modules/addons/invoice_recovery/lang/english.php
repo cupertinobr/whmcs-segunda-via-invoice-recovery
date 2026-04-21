@@ -13,6 +13,8 @@ $_ADDONLANG['security_info'] = "Secure SSL Environment — Your IP (:ip) is reco
 $_ADDONLANG['searching'] = "Searching...";
 $_ADDONLANG['error_internal'] = "Oops! An internal error occurred. Please try again later.";
 $_ADDONLANG['redirecting_gateway'] = "Forwarding to payment gateway...";
+$_ADDONLANG['too_many_attempts'] = "Too Many Attempts";
+$_ADDONLANG['too_many_attempts_desc'] = "You have reached the limit of queries. Please try again in :minutes minutes.";
 
 $_ADDONLANG['portal_disabled'] = "The invoice recovery portal is temporarily disabled.";
 $_ADDONLANG['invoice_not_found'] = "Invoice not found.";

@@ -60,6 +60,54 @@ $disableSso = ($addonConfig['disable_sso'] ?? '') === 'on';
 $enablePix = ($addonConfig['enable_pix'] ?? '') === 'on';
 $enableBoleto = ($addonConfig['enable_boleto'] ?? '') === 'on';
 $enableCartao = ($addonConfig['enable_cartao'] ?? '') === 'on';
+$limitAttempts = (int)($addonConfig['limit_attempts'] ?? 5);
+$lockoutTime = (int)($addonConfig['lockout_time'] ?? 15);
+
+$userIp = $_SERVER['REMOTE_ADDR'];
+
+/**
+ * Função para verificar e incrementar tentativas
+ */
+function checkRateLimit($ip, $maxAttempts, $lockoutMinutes, $_ADDONLANG) {
+    if ($maxAttempts <= 0) return;
+    
+    $record = Capsule::table('mod_invoice_recovery_attempts')->where('ip', $ip)->first();
+    $now = date('Y-m-d H:i:s');
+
+    if ($record) {
+        $lastAttempt = strtotime($record->last_attempt);
+        $diffMinutes = (time() - $lastAttempt) / 60;
+
+        if ($record->attempts >= $maxAttempts && $diffMinutes < $lockoutMinutes) {
+            $remaining = ceil($lockoutMinutes - $diffMinutes);
+            die('<div class="alert alert-danger shadow-sm border-0 py-3 animate-fade-in text-center">
+                    <i class="fas fa-user-shield fa-2x mb-3 d-block text-danger"></i>
+                    <h6 class="font-weight-bold">' . $_ADDONLANG['too_many_attempts'] . '</h6>
+                    <p class="mb-0 small">' . str_replace(':minutes', $remaining, $_ADDONLANG['too_many_attempts_desc']) . '</p>
+                 </div>');
+        }
+
+        if ($diffMinutes >= $lockoutMinutes) {
+            Capsule::table('mod_invoice_recovery_attempts')->where('ip', $ip)->update(['attempts' => 0]);
+        }
+    }
+}
+
+function incrementAttempts($ip) {
+    $exists = Capsule::table('mod_invoice_recovery_attempts')->where('ip', $ip)->exists();
+    if ($exists) {
+        Capsule::table('mod_invoice_recovery_attempts')->where('ip', $ip)->update([
+            'attempts' => Capsule::raw('attempts + 1'),
+            'last_attempt' => date('Y-m-d H:i:s')
+        ]);
+    } else {
+        Capsule::table('mod_invoice_recovery_attempts')->insert([
+            'ip' => $ip,
+            'attempts' => 1,
+            'last_attempt' => date('Y-m-d H:i:s')
+        ]);
+    }
+}
 
 if (!$portalEnabled && !empty($documento)) {
     die('<div class="alert alert-warning text-center">' . $_ADDONLANG['portal_disabled'] . '</div>');
@@ -102,6 +150,8 @@ if ($action === 'pay') {
  * Lógica de Busca de Faturas (via POST)
  */
 if (!empty($documento)) {
+    checkRateLimit($userIp, $limitAttempts, $lockoutTime, $_ADDONLANG);
+    
     $cliente = null;
     $inputRaw = trim($documento);
 
@@ -116,6 +166,7 @@ if (!empty($documento)) {
         $docLimpo = preg_replace('/[^0-9]/', '', $inputRaw);
         
         if (!validarCPF($docLimpo) && !validarCNPJ($docLimpo)) {
+            incrementAttempts($userIp);
             die('<div class="alert alert-danger shadow-sm border-0 py-3 animate-fade-in text-center">
                     <i class="fas fa-exclamation-circle fa-2x mb-3 d-block text-danger"></i>
                     <h6 class="font-weight-bold">' . $_ADDONLANG['invalid_data'] . '</h6>
@@ -137,12 +188,16 @@ if (!empty($documento)) {
     }
 
     if (!$cliente) {
+        incrementAttempts($userIp);
         die('<div class="alert alert-danger shadow-sm border-0 py-3 animate-fade-in text-center">
                 <i class="fas fa-user-times fa-2x mb-3 d-block text-danger"></i>
                 <h6 class="font-weight-bold">' . $_ADDONLANG['not_found'] . '</h6>
                 <p class="mb-0 small">' . $_ADDONLANG['not_found_desc'] . '</p>
              </div>');
     }
+
+    // Resetar tentativas se encontrou o cliente
+    Capsule::table('mod_invoice_recovery_attempts')->where('ip', $userIp)->update(['attempts' => 0]);
 
     // 2. Verificar se a 2ª Via está desativada para este cliente
     $isDisabled = Capsule::table('tblcustomfieldsvalues')

@@ -9,6 +9,8 @@ $_ADDONLANG['security_info'] = "Ambiente Seguro SSL — Seu IP (:ip) está regis
 $_ADDONLANG['searching'] = "Buscando...";
 $_ADDONLANG['error_internal'] = "Ops! Ocorreu um erro interno. Tente mais tarde.";
 $_ADDONLANG['redirecting_gateway'] = "Encaminhando para o gateway de pagamento...";
+$_ADDONLANG['too_many_attempts'] = "Muitas Tentativas";
+$_ADDONLANG['too_many_attempts_desc'] = "Você atingiu o limite de consultas. Por favor, tente novamente em :minutes minutos.";
 
 $_ADDONLANG['portal_disabled'] = "O portal de 2ª via está temporariamente desativado.";
 $_ADDONLANG['invoice_not_found'] = "Fatura não encontrada.";
