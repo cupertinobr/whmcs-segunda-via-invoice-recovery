@@ -37,3 +37,36 @@ $_ADDONLANG['decimal_separator'] = ",";
 $_ADDONLANG['thousands_separator'] = ".";
 $_ADDONLANG['currency_prefix'] = "R$ ";
 $_ADDONLANG['currency_suffix'] = "";
+
+// Admin & Config
+$_ADDONLANG['addon_description'] = "Portal de 2ª via simplificado para clientes.";
+$_ADDONLANG['config_enabled'] = "Ativar Portal";
+$_ADDONLANG['config_pix'] = "Habilitar Botão PIX";
+$_ADDONLANG['config_boleto'] = "Habilitar Botão Boleto";
+$_ADDONLANG['config_cartao'] = "Habilitar Botão Cartão";
+$_ADDONLANG['config_cpf_field'] = "Campo CPF/CNPJ";
+$_ADDONLANG['config_cpf_field_desc'] = "Selecione o campo personalizado que contém o CPF ou CNPJ do cliente.";
+$_ADDONLANG['config_block_field'] = "Campo Bloqueio";
+$_ADDONLANG['config_block_field_desc'] = "Selecione o campo (Sim/Não) que bloqueia o acesso deste cliente à 2ª via.";
+$_ADDONLANG['config_block_field_create'] = "Clique aqui para criar o campo automaticamente";
+$_ADDONLANG['config_pix_gateway'] = "Gateway PIX";
+$_ADDONLANG['config_pix_gateway_desc'] = "Selecione o gateway que será usado para o botão PIX.";
+$_ADDONLANG['config_boleto_gateway'] = "Gateway Boleto";
+$_ADDONLANG['config_boleto_gateway_desc'] = "Selecione o gateway que será usado para o botão Boleto.";
+$_ADDONLANG['config_cc_gateway'] = "Gateway Cartão";
+$_ADDONLANG['config_cc_gateway_desc'] = "Selecione o gateway que será usado para o botão Cartão.";
+$_ADDONLANG['config_disable_sso'] = "Desativar Login Automático";
+$_ADDONLANG['config_disable_sso_desc'] = "Se marcado, o cliente não será logado automaticamente ao acessar ou pagar faturas.";
+$_ADDONLANG['config_limit_attempts'] = "Limite de Tentativas";
+$_ADDONLANG['config_limit_attempts_desc'] = "Número máximo de consultas mal-sucedidas permitidas antes do bloqueio.";
+$_ADDONLANG['config_lockout_time'] = "Tempo de Bloqueio (min)";
+$_ADDONLANG['config_lockout_time_desc'] = "Tempo em minutos que o visitante ficará bloqueado após atingir o limite.";
+
+$_ADDONLANG['activate_success'] = "Módulo ativado com sucesso e tabela de limites criada.";
+$_ADDONLANG['activate_error'] = "Erro ao criar tabela: ";
+$_ADDONLANG['field_created_success'] = "Campo personalizado \":field\" criado com sucesso como (Apenas Admin).";
+$_ADDONLANG['field_already_exists'] = "O campo \":field\" já existe no sistema.";
+$_ADDONLANG['field_create_error'] = "Erro ao criar campo: ";
+$_ADDONLANG['dashboard_title'] = "📊 Dashboard Invoice Recovery";
+$_ADDONLANG['dashboard_active'] = "Dashboard avançado ativo ✔️";
+$_ADDONLANG['back_to_config'] = "Voltar para configurações";
