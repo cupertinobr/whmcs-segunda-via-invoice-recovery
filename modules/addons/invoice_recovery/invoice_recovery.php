@@ -28,8 +28,8 @@ function invoice_recovery_config() {
     } catch (\Exception $e) { }
 
     return [
-        "name" => "Invoice Recovery Pro",
-        "description" => "Portal de 2ª via com WhatsApp, PIX e Dashboard",
+        "name" => "Invoice Recovery (2ª via)",
+        "description" => "Portal de 2ª via",
         "version" => "1.0",
         "author" => "BRANIX Solutions",
         "fields" => [

@@ -1,48 +1,67 @@
-# segunda-via-invoice-recovery-whmcs
+# Invoice Recovery Pro - WHMCS Addon
 
-## Summary
+O **Invoice Recovery Pro** (Segunda Via) é um módulo avançado para WHMCS que facilita a recuperação e o pagamento de faturas pendentes pelos seus clientes de forma rápida, segura e sem a necessidade de login manual completo, oferecendo uma interface moderna e otimizada.
 
-An addon module allows you to add additional functionality to WHMCS. It
-can provide both client and admin facing user interfaces, as well as
-utilise hook functionality within WHMCS.
+## 🚀 Funcionalidades Principais
 
-This sample file demonstrates how an addon module for WHMCS should be
-structured and exercises all supported functionality.
+### 🔍 Busca e Recuperação Inteligente
 
-For more information, please refer to the online documentation at
-<https://developers.whmcs.com/addon-modules/>
+* **Busca Flexível:** Permite que o cliente localize faturas pendentes utilizando seu **E-mail** ou **CPF/CNPJ**.
+* **Validação Automática:** Sistema integrado de validação de formatos para CPF e CNPJ.
+* **Interface AJAX:** Consultas rápidas em tempo real sem recarregamento de página.
 
-## Recommended Module Content
+### 💳 Integração de Pagamentos Expressos
 
-The recommended structure of an addon module is as follows.
+* **Botões Diretos:** Atalhos rápidos para pagamento via **PIX**, **Boleto** e **Cartão de Crédito**.
+* **Mapeamento de Gateways:** Configure qual gateway do seu WHMCS será acionado para cada tipo de pagamento.
+* **Atualização Automática:** Ao clicar em um método de pagamento, o módulo atualiza automaticamente a fatura para o gateway correspondente antes do redirecionamento.
 
-```
- addonmodule/
-  |- lang/
-  |- lib/
-  |- templates/
-  |  addonmodule.php
-  |  hooks.php
-  |  logo.png
-```
+### 🛡️ Segurança e Controle de Acesso
 
-## Minimum Requirements
+* **Login SSO Restrito:** Gera um token de acesso seguro para o cliente visualizar a fatura, limitando a navegação apenas à página da fatura (caso o cliente tente acessar outras áreas da conta, a sessão é encerrada).
+* **Rate Limiting (Anti-Brute Force):** Proteção baseada em IP com limite configurável de tentativas e tempo de bloqueio para evitar abusos.
+* **Bloqueio por Cliente:** Opção de desativar a funcionalidade de 2ª via para clientes específicos através de campos personalizados.
+* **Controle Centralizado:** Ative ou desative o portal e métodos de pagamento específicos diretamente na configuração do addon.
 
-For the latest WHMCS minimum system requirements, please refer to
-<http://docs.whmcs.com/System_Requirements>
+### 🎨 Experiência do Usuário (UI/UX) Premium
 
-We recommend your module follows the same minimum requirements wherever
-possible.
+* **Design Moderno:** Interface "Eye-candy" com suporte total a **Modo Claro (Light)** e **Modo Escuro (Dark)**.
+* **Responsividade:** Otimizado para dispositivos móveis, tablets e desktops.
+* **Micro-animações:** Transições suaves para uma experiência mais fluida e profissional.
 
-## Tests
+### 🌍 Internacionalização
 
-We strongly encourage you to write unit tests for your work. Within this SDK we
-provide a sample unit test based upon the widely used PHPUnit.
+* **Multi-idioma:** Suporte nativo para **Português (BR)** e **Inglês**.
+* **Detecção Automática:** Identifica o idioma da sessão do usuário no WHMCS.
 
-## Useful Resources
+---
 
-* [Developer Portal](https://developers.whmcs.com/)
-* [Hook Documentation](https://developers.whmcs.com/hooks/)
-* [API Documentation](https://developers.whmcs.com/api/)
+## 🛠️ Instalação
 
-[WHMCS Limited](https://www.whmcs.com)
+1. Faça o upload da pasta `modules/addons/invoice_recovery` para o diretório `/modules/addons/` do seu WHMCS.
+2. Faça o upload do arquivo `segunda-via.php` para a **raiz** da sua instalação WHMCS.
+3. No painel administrativo do WHMCS, vá em **System Settings > Addon Modules**.
+4. Localize o **Invoice Recovery Pro** e clique em **Activate**.
+5. Clique em **Configure** para preencher as credenciais de API e mapear os campos e gateways.
+
+## ⚙️ Configuração Necessária
+
+Para o funcionamento correto das funções de pagamento e SSO:
+
+1. Vá em **System Settings > API Credentials**.
+2. Crie um novo par de credenciais e insira o **Identifier** e **Secret** nas configurações do módulo.
+3. Certifique-se de que o usuário administrador vinculado às credenciais tenha permissões para `UpdateInvoice` e `CreateSsoToken`.
+
+## 📂 Estrutura do Projeto
+
+* `segunda-via.php`: Arquivo principal da interface do cliente.
+* `/modules/addons/invoice_recovery/`:
+  * `invoice_recovery.php`: Lógica backend e configurações do addon.
+  * `/lang/`: Arquivos de tradução (PT-BR, EN).
+  * `/templates/`: Template Smarty (`clientarea.tpl`).
+  * `/assets/`: Estilização CSS e recursos visuais.
+  * `/hooks/`: Hooks de segurança para restrição de sessão.
+
+---
+
+Desenvolvido por **BRANIX Solutions**
