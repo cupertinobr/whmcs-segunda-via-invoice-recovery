@@ -16,6 +16,7 @@ add_hook('ClientAreaHeadOutput', 1, function($vars) {
             .navigation, .user-controls, .account-links,
             .header-nav, .left-sidebar, .right-sidebar,
             #main-menu, #primary-nav, #secondary-nav, .topbar, .top-nav,
+            .app-nav, .sticky-navigation,
             .footer-area, .site-header, .site-footer,
             #header, #footer, #sidebar, header, footer, aside, nav { 
                 display: none !important; 
