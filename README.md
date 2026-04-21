@@ -41,7 +41,7 @@ O **Invoice Recovery Pro** (Segunda Via) é um módulo avançado para WHMCS que 
 1. Faça o upload da pasta `modules/addons/invoice_recovery` para o diretório `/modules/addons/` do seu WHMCS.
 2. Faça o upload do arquivo `segunda-via.php` para a **raiz** da sua instalação WHMCS.
 3. No painel administrativo do WHMCS, vá em **System Settings > Addon Modules**.
-4. Localize o **Invoice Recovery Pro** e clique em **Activate**.
+4. Localize o **Invoice Recovery (2ª via)** e clique em **Activate**.
 5. Clique em **Configure** para preencher as credenciais de API e mapear os campos e gateways.
 
 ## ⚙️ Configuração Necessária
@@ -63,5 +63,3 @@ Para o funcionamento correto das funções de pagamento e SSO:
   * `/hooks/`: Hooks de segurança para restrição de sessão.
 
 ---
-
-Desenvolvido por **BRANIX Solutions**

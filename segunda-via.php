@@ -143,7 +143,7 @@ if ($action === 'pay') {
         }
     }
 
-    header("Location: viewinvoice.php?id=" . $invoiceId);
+    header("Location: viewinvoice.php?id=" . $invoiceId . "&restricted=1");
     exit;
 }
 
@@ -250,7 +250,7 @@ if (!empty($documento)) {
         
         // Gerar Link SSO com trava de restrição
         $adminUser = Capsule::table('tbladmins')->where('disabled', 0)->value('username');
-        $viewLink = "viewinvoice.php?id=" . $f->id;
+        $viewLink = "viewinvoice.php?id=" . $f->id . "&restricted=1";
         
         if ($adminUser && !$disableSso) {
             $results = localAPI('CreateSsoToken', [
