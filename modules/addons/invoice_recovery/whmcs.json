@@ -2,32 +2,36 @@
 {
     "schema": "1.0",
     "type": "whmcs-addons",
-    "name": "invoice-recovery",
+    "name": "whmcs-segunda-via-invoice-recovery",
     "license": "MIT",
-    "category": "addon",
+    "category": "finance",
     "description": {
         "name": "Invoice Recovery",
-        "tagline": "An addon module allows you to add additional functionality to WHMCS.",
-        "long": "This sample file demonstrates how an addon module for WHMCS should be structured and exercises all supported functionality.",
+        "tagline": "Simplifique a recuperação e pagamento de faturas para seus clientes.",
+        "long": "O módulo Invoice Recovery (Segunda Via) permite que seus clientes acessem e paguem faturas pendentes de forma rápida e segura, utilizando apenas o E-mail ou CPF/CNPJ, sem a necessidade de login tradicional. Oferece controle granular sobre meios de pagamento, validação de documentos e segurança reforçada com isolamento de sessão.",
         "features": [
-            "Provide both client and admin facing user interfaces",
-            "Utilize hook functionality within WHMCS"
+            "Busca avançada de faturas por E-mail ou CPF/CNPJ",
+            "Validação automática de documentos (CPF/CNPJ)",
+            "Suporte a múltiplos meios de pagamento (PIX, Boleto, Cartão)",
+            "Mapeamento flexível de gateways de pagamento",
+            "Limite de taxa (Rate Limiting) para prevenção de abusos",
+            "Segurança reforçada com isolamento de sessão SSO",
+            "Possibilidade de desativar o recurso para clientes específicos via campos personalizados",
+            "Interface Moderna, Responsiva e Multi-idioma (PT-BR/EN)"
         ]
     },
     "logo": {
-        "filename": "logo.png"
+        "filename": "assets/img/logo.png"
     },
     "support": {
-        "homepage": "https:\/\/www.whmcs.com\/", 
-        "learn_more": "https:\/\/www.whmcs.com\/tour", 
-        "email": "[EMAIL_ADDRESS]", 
-        "support_url": "https:\/\/support.whmcs.com\/",
-        "docs_url": "https:\/\/developers.whmcs.com\/addon-modules\/"
+        "homepage": "https:\/\/branix.com.br\/", 
+        "learn_more": "https:\/\/branix.com.br\/"
     },
     "authors": [
         {
-            "name": "WHMCS",
-            "homepage": "https:\/\/www.whmcs.com\/"
+            "name": "BRANIX Solutions",
+            "email": "rodolfo@branix.com.br",
+            "homepage": "https:\/\/branix.com.br\/"
         }
     ]
 }

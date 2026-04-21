@@ -1,28 +1,36 @@
-
 {
-    "name": "whmcs/sample-addon-module",
-    "description": "Sample Addon Module for WHMCS Billing Automation Platform",
+    "name": "cupertinobr/whmcs-segunda-via-invoice-recovery",
+    "description": "Addon Module for WHMCS - Invoice Recovery (2ª Via)",
+    "type": "project",
     "keywords": [
         "whmcs",
-        "web host automation platform",
-        "addon module"
+        "addon-module",
+        "invoice-recovery",
+        "segunda-via"
     ],
-    "homepage": "http://www.whmcs.com/",
+    "homepage": "https://branix.com.br/",
     "license": "MIT",
     "authors": [
         {
-            "name": "WHMCS Development Team",
-            "email": "development@whmcs.com",
-            "homepage": "http://www.whmcs.com/",
-            "role": "Developer"
+            "name": "BRANIX Solutions",
+            "email": "rodolfo@branix.com.br",
+            "homepage": "https://branix.com.br/"
         }
     ],
-    "support": {
-        "email": "support@whmcs.com",
-        "forum": "http://forums.whmcs.com/",
-        "wiki": "http://docs.whmcs.com/"
+    "require": {
+        "php": ">=7.4",
+        "ext-curl": "*",
+        "ext-json": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "@stable"
+        "phpunit/phpunit": "^9.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Branix\\WhmcsInvoiceRecovery\\": "modules/addons/invoice_recovery/lib/"
+        }
+    },
+    "support": {
+        "homepage": "https://branix.com.br/"
     }
 }
