@@ -43,6 +43,12 @@ function invoice_recovery_config() {
                 "Options" => $customFields,
                 "Description" => "Selecione o campo personalizado que contém o CPF ou CNPJ do cliente.",
             ],
+            "block_field_id" => [
+                "FriendlyName" => "Campo Bloqueio",
+                "Type" => "dropdown",
+                "Options" => $customFields,
+                "Description" => "Selecione o campo (Sim/Não) que bloqueia o acesso deste cliente à 2ª via.",
+            ],
             "pix_gateway_id" => [
                 "FriendlyName" => "Gateway PIX",
                 "Type" => "dropdown",

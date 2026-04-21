@@ -62,6 +62,7 @@ $enableBoleto = ($addonConfig['enable_boleto'] ?? '') === 'on';
 $enableCartao = ($addonConfig['enable_cartao'] ?? '') === 'on';
 $limitAttempts = (int)($addonConfig['limit_attempts'] ?? 5);
 $lockoutTime = (int)($addonConfig['lockout_time'] ?? 15);
+$blockFieldId = (int)($addonConfig['block_field_id'] ?? 0);
 
 $userIp = $_SERVER['REMOTE_ADDR'];
 
@@ -200,14 +201,27 @@ if (!empty($documento)) {
     Capsule::table('mod_invoice_recovery_attempts')->where('ip', $userIp)->update(['attempts' => 0]);
 
     // 2. Verificar se a 2ª Via está desativada para este cliente
-    $isDisabled = Capsule::table('tblcustomfieldsvalues')
-        ->join('tblcustomfields', 'tblcustomfields.id', '=', 'tblcustomfieldsvalues.fieldid')
-        ->where('tblcustomfields.type', 'client')
-        ->where('tblcustomfields.fieldname', 'like', '%Desativar 2ª Via%')
-        ->where('tblcustomfieldsvalues.relid', $cliente->id)
-        ->value('value');
+    $isDisabled = false;
+    if ($blockFieldId > 0) {
+        $statusBlocked = Capsule::table('tblcustomfieldsvalues')
+            ->where('fieldid', $blockFieldId)
+            ->where('relid', $cliente->id)
+            ->value('value');
+        
+        $isDisabled = (strtolower($statusBlocked) == 'yes' || strtolower($statusBlocked) == 'on' || $statusBlocked == '1');
+    } else {
+        // Fallback para busca por nome se não configurado ID
+        $statusBlocked = Capsule::table('tblcustomfieldsvalues')
+            ->join('tblcustomfields', 'tblcustomfields.id', '=', 'tblcustomfieldsvalues.fieldid')
+            ->where('tblcustomfields.type', 'client')
+            ->where('tblcustomfields.fieldname', 'like', '%Desativar 2ª Via%')
+            ->where('tblcustomfieldsvalues.relid', $cliente->id)
+            ->value('value');
+        
+        $isDisabled = (strtolower($statusBlocked) == 'yes' || strtolower($statusBlocked) == 'on' || $statusBlocked == '1');
+    }
 
-    if (strtolower($isDisabled) == 'yes' || strtolower($isDisabled) == 'on' || $isDisabled == '1') {
+    if ($isDisabled) {
         die('<div class="alert alert-warning shadow-sm border-0 py-3 animate-fade-in text-center">
                 <i class="fas fa-user-lock fa-2x mb-3 d-block text-warning"></i>
                 <h6 class="font-weight-bold">' . $_ADDONLANG['restricted_access'] . '</h6>
