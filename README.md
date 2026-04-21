@@ -1,4 +1,4 @@
-# Invoice Recovery Pro - WHMCS Addon
+# Invoice Recovery (Segunda Via) - WHMCS Addon
 
 O **Invoice Recovery (Segunda Via)** é um módulo avançado para WHMCS que facilita a recuperação e o pagamento de faturas pendentes pelos seus clientes de forma rápida, segura e sem a necessidade de login manual completo, oferecendo uma interface moderna e otimizada.
 
