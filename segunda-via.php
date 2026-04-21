@@ -275,7 +275,7 @@ if (!empty($documento)) {
         }
         
         if ($enableCartao) {
-            echo "<a href='{$payCreditCardLink}' target='_blank' class='btn-act btn-act-primary btn-pay'><i class='fas fa-credit-card'></i> {$_ADDONLANG['cartao']}</a>";
+            echo "<a href='{$payCreditCardLink}' target='_blank' class='btn-act btn-act-primary btn-pay'><i class='fas fa-credit-card'></i> {$_ADDONLANG['credit_card']}</a>";
         }
         
         echo "</div></div>";
