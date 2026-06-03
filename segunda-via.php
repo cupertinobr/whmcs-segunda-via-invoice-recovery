@@ -2,6 +2,9 @@
 define("CLIENTAREA", true);
 require_once __DIR__ . '/init.php';
 
+// Restore the default PHP error handler to prevent WHMCS from converting notices/warnings to HTTP 500
+while (restore_error_handler());
+
 register_shutdown_function(function() {
     $error = error_get_last();
     if ($error === null || !in_array($error['type'] ?? 0, [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
