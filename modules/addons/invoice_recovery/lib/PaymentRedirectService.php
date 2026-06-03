@@ -54,6 +54,14 @@ class PaymentRedirectService
 
             if (isset($results['result']) && $results['result'] === 'success') {
                 return $results['redirect_url'] . '&restricted=1';
+            } else {
+                $errorMsg = $results['message'] ?? 'Unknown error or invalid admin permissions';
+                LoggerService::log(
+                    $_SERVER['REMOTE_ADDR'] ?? '',
+                    (int)$session['client_id'],
+                    'sso_failed',
+                    "SSO failed: {$errorMsg} (Admin: {$adminUser})"
+                );
             }
         }
 
@@ -98,6 +106,14 @@ class PaymentRedirectService
 
             if (isset($results['result']) && $results['result'] === 'success') {
                 return $results['redirect_url'] . '&restricted=1';
+            } else {
+                $errorMsg = $results['message'] ?? 'Unknown error or invalid admin permissions';
+                LoggerService::log(
+                    $_SERVER['REMOTE_ADDR'] ?? '',
+                    (int)$session['client_id'],
+                    'sso_failed',
+                    "SSO failed: {$errorMsg} (Admin: {$adminUser})"
+                );
             }
         }
 

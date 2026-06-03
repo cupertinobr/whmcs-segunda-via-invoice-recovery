@@ -13,6 +13,9 @@ add_hook('ClientAreaInit', 1, function () {
         $script = basename($_SERVER['SCRIPT_NAME'] ?? '');
 
         if (!Security::isRestrictedPageAllowed($script)) {
+            if (function_exists('logActivity')) {
+                logActivity("Invoice Recovery: Restricted mode blocked access to script '{$script}' and triggered logout.");
+            }
             unset($_SESSION['restricted_invoice_mode']);
             header('Location: logout.php?returnurl=segunda-via.php');
             exit;
