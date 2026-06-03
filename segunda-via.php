@@ -1,6 +1,14 @@
 <?php
 define("CLIENTAREA", true);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/init.php';
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 // Autoloader PSR-4 de fallback para as classes do Addon
 spl_autoload_register(function ($class) {
