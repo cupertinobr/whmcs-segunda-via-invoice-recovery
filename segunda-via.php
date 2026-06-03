@@ -1,6 +1,16 @@
 <?php
 define("CLIENTAREA", true);
 require_once __DIR__ . '/init.php';
+
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error === null || !in_array($error['type'] ?? 0, [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        if (http_response_code() === 500) {
+            http_response_code(200);
+        }
+    }
+});
+
 // Autoloader PSR-4 de fallback para as classes do Addon
 spl_autoload_register(function ($class) {
     $prefix = 'branix\\WhmcsInvoiceRecovery\\';
@@ -342,6 +352,9 @@ $ca->assign('disable_cdn', $disableCdn);
 $ca->setTemplate('/modules/addons/invoice_recovery/templates/clientarea.tpl');
 
 $ca->output();
+if (http_response_code() === 500) {
+    http_response_code(200);
+}
 } catch (\Throwable $e) {
     http_response_code(500);
     echo "<h1>Debug Error: " . htmlspecialchars($e->getMessage()) . "</h1>";
