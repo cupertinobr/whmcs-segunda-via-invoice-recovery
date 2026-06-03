@@ -23,12 +23,41 @@ class Security
 
     public static function generateCsrfToken(): string
     {
-        return generate_token(self::TOKEN_SCOPE);
+        $token = generate_token(self::TOKEN_SCOPE);
+        if (is_string($token) && $token !== '') {
+            return $token;
+        }
+
+        if (isset($_SESSION['tkvals'][self::TOKEN_SCOPE]) && is_string($_SESSION['tkvals'][self::TOKEN_SCOPE]) && $_SESSION['tkvals'][self::TOKEN_SCOPE] !== '') {
+            return $_SESSION['tkvals'][self::TOKEN_SCOPE];
+        }
+
+        // Fallback generation if WHMCS token functions are not behaving as expected
+        $fallbackToken = sha1(uniqid((string)mt_rand(), true));
+        $_SESSION['tkvals'][self::TOKEN_SCOPE] = $fallbackToken;
+        return $fallbackToken;
     }
 
     public static function validateCsrfToken(?string $token): bool
     {
-        return check_token(self::TOKEN_SCOPE, $token ?? '');
+        if ($token === null || $token === '') {
+            return false;
+        }
+
+        // Try using native WHMCS check first
+        if (function_exists('check_token')) {
+            try {
+                if (check_token(self::TOKEN_SCOPE, $token)) {
+                    return true;
+                }
+            } catch (\Throwable $e) {
+                // Fallback to manual check
+            }
+        }
+
+        // Manual validation fallback
+        $stored = $_SESSION['tkvals'][self::TOKEN_SCOPE] ?? null;
+        return is_string($stored) && hash_equals($stored, $token);
     }
 
     public static function establishSession(int $clientId, array $invoiceIds): void
