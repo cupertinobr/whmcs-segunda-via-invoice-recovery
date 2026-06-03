@@ -9,6 +9,7 @@
 
         <div class="search-card">
             <form id="formBusca" class="search-form">
+                <input type="hidden" name="token" value="{$csrf_token}">
                 <div class="input-box">
                     <i class="fas fa-search"></i>
                     <input type="text" name="documento" id="documentoInput" placeholder="{$RECOVERY_LANG.input_placeholder}" required>
@@ -28,23 +29,20 @@
         <div id="resultado" class="results-wrapper"></div>
 
         <div class="security-info text-center">
-            <p><i class="fas fa-lock"></i> {$RECOVERY_LANG.security_info|replace:':ip':'<span id="user-ip">...</span>'}</p>
+            <p><i class="fas fa-lock"></i> {$RECOVERY_LANG.security_info|replace:':ip':$user_ip}</p>
         </div>
 
     </div>
 </div>
 
+{if !$disable_cdn}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+{/if}
 <link href="modules/addons/invoice_recovery/assets/style.css" rel="stylesheet" type="text/css" />
 
 
 <script>
 $(document).ready(function() {
-    // Buscar IP via API externa
-    $.getJSON('https://api.ipify.org?format=json', function(data) {
-        $("#user-ip").text(data.ip);
-    });
-
     // Filtro para aceitar apenas caracteres válidos para busca (números, letras, @, pontos)
     $("#documentoInput").on("input", function() {
         this.value = this.value.replace(/[^0-9a-zA-Z.@\-\/]/g, "");
@@ -74,19 +72,17 @@ $(document).ready(function() {
         });
     });
 
-    // Feedback visual ao processar pagamento
-    $(document).on("click", ".btn-action", function(e) {
+    // Feedback visual ao processar pagamento ou visualização
+    $(document).on("click", ".btn-pay", function(e) {
         const $this = $(this);
-        if($this.hasClass('btn-pay')) {
-            setTimeout(function() {
-                 $("#resultado").fadeOut();
-                 $("#loading").removeClass("d-none").find('p').text('{$RECOVERY_LANG.redirecting_gateway}');
-                 
-                 setTimeout(function() {
-                     location.reload();
-                 }, 5000);
-            }, 800);
-        }
+        setTimeout(function() {
+             $("#resultado").fadeOut();
+             $("#loading").removeClass("d-none").find('p').text('{$RECOVERY_LANG.redirecting_gateway}');
+             
+             setTimeout(function() {
+                 location.reload();
+             }, 5000);
+        }, 800);
     });
 });
 </script>

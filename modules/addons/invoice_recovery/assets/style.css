@@ -185,6 +185,12 @@ body.dark-mode .invoice-card-custom, body.theme-dark .invoice-card-custom, body.
 .invoice-btns {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pay-form-inline {
+    display: inline-flex;
+    margin: 0;
 }
 
 .btn-act {
@@ -219,4 +225,13 @@ body.dark-mode .btn-act-light, body.theme-dark .btn-act-light, body.dark .btn-ac
     .invoice-card-custom { flex-direction: column; align-items: flex-start; gap: 20px; }
     .invoice-btns { width: 100%; }
     .btn-act { flex: 1; justify-content: center; }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
 }

@@ -42,15 +42,14 @@ O **Invoice Recovery (Segunda Via)** é um módulo avançado para WHMCS que faci
 2. Faça o upload do arquivo `segunda-via.php` para a **raiz** da sua instalação WHMCS.
 3. No painel administrativo do WHMCS, vá em **System Settings > Addon Modules**.
 4. Localize o **Invoice Recovery (2ª via)** e clique em **Activate**.
-5. Clique em **Configure** para preencher as credenciais de API e mapear os campos e gateways.
+5. Clique em Configure para selecionar o usuário administrador e mapear os campos e gateways.
 
 ## ⚙️ Configuração Necessária
 
 Para o funcionamento correto das funções de pagamento e SSO:
 
-1. Vá em **System Settings > API Credentials**.
-2. Crie um novo par de credenciais e insira o **Identifier** e **Secret** nas configurações do módulo.
-3. Certifique-se de que o usuário administrador vinculado às credenciais tenha permissões para `UpdateInvoice` e `CreateSsoToken`.
+1. No menu de configuração do módulo, selecione no dropdown **Usuário Admin para API** um administrador ativo da sua instalação.
+2. Certifique-se de que o usuário administrador selecionado tenha permissões para `UpdateInvoice` e `CreateSsoToken`.
 
 ## 📂 Estrutura do Projeto
 

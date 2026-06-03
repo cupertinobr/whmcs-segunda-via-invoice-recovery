@@ -27,7 +27,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Branix\\WhmcsInvoiceRecovery\\": "modules/addons/invoice_recovery/lib/"
+            "branix\\WhmcsInvoiceRecovery\\": "modules/addons/invoice_recovery/lib/"
         }
     },
     "support": {
