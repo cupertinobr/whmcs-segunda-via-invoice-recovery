@@ -1,13 +1,6 @@
 <?php
 define("CLIENTAREA", true);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 require_once __DIR__ . '/init.php';
-
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
 // Autoloader PSR-4 de fallback para as classes do Addon
 spl_autoload_register(function ($class) {
     $prefix = 'branix\\WhmcsInvoiceRecovery\\';
@@ -35,12 +28,13 @@ use branix\WhmcsInvoiceRecovery\PaymentRedirectService;
 use WHMCS\Database\Capsule;
 
 try {
-// Define explicit UTF-8 charset for AJAX
-header('Content-Type: text/html; charset=utf-8');
 
 // Load Addon Language
 $language = (isset($_SESSION['Language']) && $_SESSION['Language']) ? $_SESSION['Language'] : 'portuguese-br';
 $language = strtolower($language);
+if ($language === 'portuguese') {
+    $language = 'portuguese-br';
+}
 $langFile = __DIR__ . '/modules/addons/invoice_recovery/lang/' . $language . '.php';
 if (!file_exists($langFile)) {
     $langFile = __DIR__ . '/modules/addons/invoice_recovery/lang/english.php';
