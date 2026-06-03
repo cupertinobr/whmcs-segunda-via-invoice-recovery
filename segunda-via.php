@@ -86,11 +86,12 @@ function irSecurityAlert(string $type, string $title, string $desc = ''): void
          </div>');
 }
 
-function irRenderPayForm(int $invoiceId, string $gateway, string $token, string $label, string $icon): string
+function irRenderPayForm(int $invoiceId, string $gateway, string $recoveryToken, string $whmcsToken, string $label, string $icon): string
 {
     $invoiceId = (int) $invoiceId;
     $gateway = htmlspecialchars($gateway, ENT_QUOTES, 'UTF-8');
-    $token = htmlspecialchars($token, ENT_QUOTES, 'UTF-8');
+    $recoveryToken = htmlspecialchars($recoveryToken, ENT_QUOTES, 'UTF-8');
+    $whmcsToken = htmlspecialchars($whmcsToken, ENT_QUOTES, 'UTF-8');
     $label = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
     $icon = htmlspecialchars($icon, ENT_QUOTES, 'UTF-8');
 
@@ -98,22 +99,25 @@ function irRenderPayForm(int $invoiceId, string $gateway, string $token, string 
                 <input type='hidden' name='action' value='pay'>
                 <input type='hidden' name='invoiceid' value='{$invoiceId}'>
                 <input type='hidden' name='gateway' value='{$gateway}'>
-                <input type='hidden' name='token' value='{$token}'>
+                <input type='hidden' name='recovery_token' value='{$recoveryToken}'>
+                <input type='hidden' name='token' value='{$whmcsToken}'>
                 <button type='submit' class='btn-act btn-act-primary btn-pay'><i class='fas {$icon}'></i> {$label}</button>
             </form>";
 }
 
-function irRenderViewForm(int $invoiceId, string $token, string $label, string $icon): string
+function irRenderViewForm(int $invoiceId, string $recoveryToken, string $whmcsToken, string $label, string $icon): string
 {
     $invoiceId = (int) $invoiceId;
-    $token = htmlspecialchars($token, ENT_QUOTES, 'UTF-8');
+    $recoveryToken = htmlspecialchars($recoveryToken, ENT_QUOTES, 'UTF-8');
+    $whmcsToken = htmlspecialchars($whmcsToken, ENT_QUOTES, 'UTF-8');
     $label = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
     $icon = htmlspecialchars($icon, ENT_QUOTES, 'UTF-8');
 
     return "<form method='post' action='segunda-via.php' target='_blank' class='pay-form-inline'>
                 <input type='hidden' name='action' value='view'>
                 <input type='hidden' name='invoiceid' value='{$invoiceId}'>
-                <input type='hidden' name='token' value='{$token}'>
+                <input type='hidden' name='recovery_token' value='{$recoveryToken}'>
+                <input type='hidden' name='token' value='{$whmcsToken}'>
                 <button type='submit' class='btn-act btn-act-light btn-pay'><i class='fas {$icon}'></i> {$label}</button>
             </form>";
 }
@@ -137,7 +141,7 @@ if ($action === 'pay') {
         irSecurityAlert('danger', $_ADDONLANG['too_many_attempts'], $msg);
     }
 
-    if (!Security::validateCsrfToken($_POST['token'] ?? '')) {
+    if (!Security::validateCsrfToken($_POST['recovery_token'] ?? '')) {
         RateLimiter::incrementAttempts($userIp);
         irSecurityAlert('danger', $_ADDONLANG['invalid_token'], $_ADDONLANG['invalid_token_desc']);
     }
@@ -193,7 +197,7 @@ if ($action === 'view') {
         irSecurityAlert('danger', $_ADDONLANG['too_many_attempts'], $msg);
     }
 
-    if (!Security::validateCsrfToken($_POST['token'] ?? '')) {
+    if (!Security::validateCsrfToken($_POST['recovery_token'] ?? '')) {
         RateLimiter::incrementAttempts($userIp);
         irSecurityAlert('danger', $_ADDONLANG['invalid_token'], $_ADDONLANG['invalid_token_desc']);
     }
@@ -236,7 +240,7 @@ if (!empty($documento)) {
         irSecurityAlert('danger', $_ADDONLANG['too_many_attempts'], $msg);
     }
 
-    if (!Security::validateCsrfToken($_POST['token'] ?? '')) {
+    if (!Security::validateCsrfToken($_POST['recovery_token'] ?? '')) {
         RateLimiter::incrementAttempts($userIp);
         irSecurityAlert('danger', $_ADDONLANG['invalid_token'], $_ADDONLANG['invalid_token_desc']);
     }
@@ -300,19 +304,24 @@ if (!empty($documento)) {
             </div>
             <div class='invoice-btns'>";
         
+        $whmcsToken = $_SESSION['tkval'] ?? '';
+        if (empty($whmcsToken) && function_exists('generate_token')) {
+            $whmcsToken = generate_token();
+        }
+
         // On-demand View Button (View SSO)
-        echo irRenderViewForm((int)$f->id, $csrfToken, $_ADDONLANG['view'], 'fa-eye');
+        echo irRenderViewForm((int)$f->id, $csrfToken, $whmcsToken, $_ADDONLANG['view'], 'fa-eye');
 
         if ($enablePix && $pixGateway) {
-            echo irRenderPayForm((int)$f->id, $pixGateway, $csrfToken, $_ADDONLANG['pix'], 'fa-qrcode');
+            echo irRenderPayForm((int)$f->id, $pixGateway, $csrfToken, $whmcsToken, $_ADDONLANG['pix'], 'fa-qrcode');
         }
 
         if ($enableBoleto && $boletoGateway) {
-            echo irRenderPayForm((int)$f->id, $boletoGateway, $csrfToken, $_ADDONLANG['boleto'], 'fa-barcode');
+            echo irRenderPayForm((int)$f->id, $boletoGateway, $csrfToken, $whmcsToken, $_ADDONLANG['boleto'], 'fa-barcode');
         }
 
         if ($enableCartao && $ccGateway) {
-            echo irRenderPayForm((int)$f->id, $ccGateway, $csrfToken, $_ADDONLANG['credit_card'], 'fa-credit-card');
+            echo irRenderPayForm((int)$f->id, $ccGateway, $csrfToken, $whmcsToken, $_ADDONLANG['credit_card'], 'fa-credit-card');
         }
 
         echo '</div></div>';
