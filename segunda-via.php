@@ -8,8 +8,6 @@ require_once __DIR__ . '/init.php';
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 // Autoloader PSR-4 de fallback para as classes do Addon
 spl_autoload_register(function ($class) {
     $prefix = 'branix\\WhmcsInvoiceRecovery\\';
@@ -36,6 +34,7 @@ use branix\WhmcsInvoiceRecovery\InvoiceSearchService;
 use branix\WhmcsInvoiceRecovery\PaymentRedirectService;
 use WHMCS\Database\Capsule;
 
+try {
 // Define explicit UTF-8 charset for AJAX
 header('Content-Type: text/html; charset=utf-8');
 
@@ -344,3 +343,9 @@ $ca->assign('disable_cdn', $disableCdn);
 $ca->setTemplate('/modules/addons/invoice_recovery/templates/clientarea.tpl');
 
 $ca->output();
+} catch (\Throwable $e) {
+    http_response_code(500);
+    echo "<h1>Debug Error: " . htmlspecialchars($e->getMessage()) . "</h1>";
+    echo "<pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
+    exit;
+}
