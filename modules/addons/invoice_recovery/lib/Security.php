@@ -10,6 +10,7 @@ class Security
 
     /** Allowed pages during the restricted SSO session mode. */
     public const RESTRICTED_ALLOWED_PAGES = [
+        'segunda-via.php',
         'viewinvoice.php',
         'logout.php',
         'singlesignon.php',
