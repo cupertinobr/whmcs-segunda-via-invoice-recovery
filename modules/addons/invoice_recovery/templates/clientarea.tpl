@@ -9,7 +9,8 @@
 
         <div class="search-card">
             <form id="formBusca" class="search-form">
-                <input type="hidden" name="token" value="{$csrf_token}">
+                <input type="hidden" name="recovery_token" value="{$csrf_token}">
+                <input type="hidden" name="token" value="{$token}">
                 <div class="input-box">
                     <i class="fas fa-search"></i>
                     <input type="text" name="documento" id="documentoInput" placeholder="{$RECOVERY_LANG.input_placeholder}" required>
