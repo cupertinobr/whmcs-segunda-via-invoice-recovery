@@ -337,6 +337,11 @@ $ca->addToBreadCrumb('segunda-via.php', $_ADDONLANG['page_title']);
 $ca->initPage();
 $ca->assign('RECOVERY_LANG', $_ADDONLANG);
 $ca->assign('csrf_token', Security::generateCsrfToken());
+$whmcsToken = $_SESSION['tkval'] ?? '';
+if (empty($whmcsToken) && function_exists('generate_token')) {
+    $whmcsToken = generate_token();
+}
+$ca->assign('token', $whmcsToken);
 $ca->assign('user_ip', $userIp);
 $ca->assign('disable_cdn', $disableCdn);
 
